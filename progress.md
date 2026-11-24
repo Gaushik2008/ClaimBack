@@ -49,3 +49,4 @@
 - Same centre confound persists: Ahmedabad 306 dismissed vs 61 allowed; Delhi 123 allowed vs 8 dismissed. Chennai only 25 labelled.
 - The outcome-rule change also affects Book 17 labels; re-run eval.run and re-audit label_audit.json.
 - Data stays in data/raw (git-ignored), not committed.
+- Added docs/BUILD_PROMPT.md (phased build prompt for fcc-claude).
