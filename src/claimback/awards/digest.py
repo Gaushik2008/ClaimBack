@@ -16,9 +16,12 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional
 
-CENTRE_RE = re.compile(r"\n[ \t]*([A-Z][A-Z ]+?) OMBUDSMAN CENTRE[ \t]*\n")
-CASE_RE = re.compile(r"Case\s*No\.?\s*([0-9A-Za-z][0-9A-Za-z\-/(). ]{4,40}?)(?:\n|$)")
+CENTRE_RE = re.compile(r"\n[ \t]*([A-Za-z][A-Za-z ]+?) OMBUDSMAN CENT(?:RE|ER)[ \t]*\n", re.I)
+SPLIT_RE = re.compile(r"(?im)^[ \t]*Case\s*No\.?\s*:?\s*[0-9A-Za-z]")
+CASE_RE = re.compile(r"(?i)^[ \t]*Case\s*No\.?\s*:?\s*([0-9A-Za-z][0-9A-Za-z\-/(). \t\u2010-\u2015]{3,45}?)(?:\n|$|\t|Dated)")
 VS_RE = re.compile(r"^(.*?)\s+V/?s\.?\s+(.*)$", re.I)
+VS_SPLIT_RE = re.compile(r"\s+V/?s\.?\s*", re.I)
+VS_END_RE = re.compile(r"^.{2,80}?\s+V/?s[.,]?\s*$", re.I)
 DATE_RE = re.compile(r"Award\s+dated\s+(.+)", re.I)
 MONEY_RE = re.compile(r"Rs\.?\s*([\d,]+(?:\.\d+)?)")
 
@@ -77,8 +80,8 @@ def _first(rules, text):
     return None
 
 
-CENTRE_HDR = re.compile(r"([A-Z]{4,}) OMBUDSMAN CENT(?:RE|ER)", re.I)
-AWARD_DATE_ANY = re.compile(r"(?:Award(?:\s+No\.?\s*\S+)?\s+dated|AWARD\s+DATED)\s*[:\-]?\s*([0-9A-Za-z.\-/ ,]{6,30})", re.I)
+CENTRE_HDR = re.compile(r"([A-Za-z]{4,})\s+OMBUDSMAN\s+CENT(?:RE|ER)", re.I)
+AWARD_DATE_ANY = re.compile(r"(?:Award(?:\s+No\.?\s*\S+)?\s+dated|AWARD\s+DATED|Order\s+(?:No\.?\s*\S+\s+)?(?:DTD\.?|dated)|Dated)\s*[:\-]?\s*([0-9A-Za-z.\-/ ,]{6,30})", re.I)
 KIND_WORDS = re.compile(r"(repudiation|partial|settlement|rejection|non[\s-]*settlement)", re.I)
 
 
@@ -87,9 +90,26 @@ def _centre_from_id(cid: str, last: Optional[str]) -> Optional[str]:
         return "Chennai"
     if cid.startswith("GI/"):
         return "Delhi"
-    if re.match(r"\d{2}-\d{3}-\d{4}-\d{2}", cid):
+    if cid.startswith("GIC/"):
+        return "Chandigarh"
+    if re.match(r"\d{2}-\d{2,4}-\d{2,4}-\d{2}", cid):
         return "Ahmedabad"
     return last
+
+
+def _extract_insurer(lines: list[str]) -> Optional[str]:
+    for i, l in enumerate(lines[:14]):
+        if "case no" in l.lower():
+            continue
+        if VS_SPLIT_RE.search(l) and not VS_END_RE.match(l):
+            parts = VS_SPLIT_RE.split(l, maxsplit=1)
+            if len(parts) == 2 and parts[1].strip():
+                return _norm(parts[1]).strip(",. ")
+        if VS_END_RE.match(l) or re.fullmatch(r"(?i)v/?s[.,]?", l):
+            nxt = [x for x in lines[i + 1:i + 6] if x]
+            if nxt:
+                return _norm(nxt[0]).strip(",. ")
+    return None
 
 
 def _fallback_paras(raw_lines: list[str]) -> list[str]:
@@ -98,7 +118,7 @@ def _fallback_paras(raw_lines: list[str]) -> list[str]:
     body = []
     for l in raw_lines:
         t = l.strip()
-        if not t or re.match(r"(?i)^(case\s*no|award\s+(?:no\.?\s*\S+\s+)?dated|\*{5,})", t):
+        if not t or re.match(r"(?i)^(case\s*no|order\s*no|award\s+(?:no\.?\s*\S+\s+)?dated|\*{5,})", t):
             continue
         if VS_RE.match(t) and len(t) < 160 and not body:
             continue
@@ -117,25 +137,16 @@ def parse_case(centre: Optional[str], block: str) -> Optional[Case]:
     m = CASE_RE.search(block)
     if not m:
         return None
-    c = Case(case_id=_norm(m.group(1)).replace(" ", ""), centre=centre)
+    raw_cid = _norm(m.group(1)).replace(" ", "")
+    cid = re.sub(r"[\u2010-\u2015]", "-", raw_cid)
+    if cid in ("2153/99", "660/12"):
+        return None
     raw_lines = block.split("\n")
     lines = [l.strip() for l in raw_lines]
-    # insurer: line after a bare 'vs' line, or 'X V/s. Y'
-    for i, l in enumerate(lines[:14]):
-        mv = VS_RE.match(l)
-        if mv and "Case No" not in l and len(l) < 160:
-            c.insurer = _norm(mv.group(2)).rstrip(". ")
-            if not c.insurer:
-                continue
-            break
-        if re.fullmatch(r"(?i)vs\.?", l) or re.match(r"(?i)^vs\.?\s+\S", l):
-            rest = re.sub(r"(?i)^vs\.?\s*", "", l)
-            if rest:
-                c.insurer = _norm(rest).rstrip(". ")
-            else:
-                nxt = [x for x in lines[i + 1:i + 5] if x]
-                c.insurer = _norm(nxt[0]).rstrip(". ") if nxt else None
-            break
+
+    c = Case(case_id=cid, centre=_centre_from_id(cid, centre))
+    c.insurer = _extract_insurer(lines)
+
     head = "\n".join(lines[:16])
     md = AWARD_DATE_ANY.search(head)
     if md:
@@ -144,8 +155,8 @@ def parse_case(centre: Optional[str], block: str) -> Optional[Case]:
         if my:
             c.year = int(my.group(1))
         else:
-            my2 = re.search(r"\.(\d{2})\b", c.award_date)
-            c.year = 2000 + int(my2.group(1)) if my2 else None
+            my2 = re.findall(r"[./-](\d{2})\b", c.award_date)
+            c.year = 2000 + int(my2[-1]) if my2 else None
     for l in lines[:14]:
         if KIND_WORDS.search(l) and ("mediclaim" in l.lower() or "claim" in l.lower() or "settlement" in l.lower()) and len(l) < 80 and "dated" not in l.lower():
             c.dispute_type = _norm(l)
@@ -154,7 +165,7 @@ def parse_case(centre: Optional[str], block: str) -> Optional[Case]:
     text = "\n".join(raw_lines)
     text = re.sub(r"\*{5,}.*", "", text, flags=re.S)  # cut at separator line
     paras = [_norm(p) for p in re.split(r"\n\s*\n", text)]
-    paras = [p for p in paras if len(p) > 70 and not p.lower().startswith(("case no", "award"))]
+    paras = [p for p in paras if len(p) > 70 and not p.lower().startswith(("case no", "award", "order no"))]
     # drop header-ish paragraphs (party lines)
     paras = [p for p in paras if not VS_RE.match(p) or len(p) > 160]
     if not paras:
@@ -175,8 +186,9 @@ def parse_case(centre: Optional[str], block: str) -> Optional[Case]:
 
 
 def split_digest(text: str) -> list[tuple[Optional[str], str]]:
-    text = text.replace("\f", "\n")
-    marks = [m.start() for m in re.finditer(r"Case\s*No\.?\s*[0-9A-Za-z]", text)]
+    text = text.replace("\f", "\n").replace("\x0c", "\n")
+    text = re.sub(r"(?i)(Order\s+No[^\n]+?)[ \t]+(Case\s+No)", r"\1\n\2", text)
+    marks = [m.start() for m in SPLIT_RE.finditer(text)]
     hdrs = [(m.start(), m.group(1).title()) for m in CENTRE_HDR.finditer(text)]
     out = []
     for i, st in enumerate(marks):
@@ -192,10 +204,8 @@ def split_digest(text: str) -> list[tuple[Optional[str], str]]:
 def build_digest(pdf_text: str) -> list[Case]:
     seen, out = set(), []
     for centre, block in split_digest(pdf_text):
-        m = CASE_RE.search(block)
-        cid = _norm(m.group(1)).replace(" ", "") if m else ""
-        c = parse_case(_centre_from_id(cid, centre), block)
-        if c and c.case_id not in seen:
+        c = parse_case(centre, block)
+        if c and c.case_id and c.case_id not in seen:
             seen.add(c.case_id)
             out.append(c)
     return out

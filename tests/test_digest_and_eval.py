@@ -32,6 +32,49 @@ def test_digest_parses_case_without_name():
     assert "Test Person" not in str(c.to_dict())
 
 
+def test_digest_parses_order_and_inline_case_headers():
+    raw = """
+                  BHOPAL OMBUDSMAN CENTRE
+
+Order No.: BPL/GI/0910/002                         Case No.: GI/RSI /0209/103
+
+Dated 6th May, 2009
+
+Shri Complainant Name & others
+                V/s
+The Royal Sundaram Alliance Insurance Co. Ltd., Chennai
+
+Brief Background
+Hospital cash insurance claim was repudiated under clause 4.1.
+The decision of the insurer is justified and complaint dismissed.
+**********************************************
+CASE NO. GIC/323/NIC/14/09
+
+Manohar Lal Nagpal Vs. National Insurance Co. Ltd.
+
+Order dated 07.11.08
+Claim for Rs. 50,000 was repudiated on ground of pre-existing disease.
+Hon'ble Ombudsman directed to pay within 30 days.
+"""
+    cs = build_digest(raw)
+    assert len(cs) == 2
+    c1 = cs[0]
+    assert c1.case_id == "GI/RSI/0209/103"
+    assert c1.centre in ("Bhopal", "Delhi")  # recognized centre
+    assert "Royal Sundaram" in c1.insurer
+    assert c1.year == 2009
+    assert c1.outcome == "dismissed"
+    assert "Complainant Name" not in str(c1.to_dict())
+
+    c2 = cs[1]
+    assert c2.case_id == "GIC/323/NIC/14/09"
+    assert c2.centre == "Chandigarh"
+    assert "National Insurance" in c2.insurer
+    assert c2.year == 2008
+    assert c2.outcome == "allowed"
+    assert "Manohar Lal" not in str(c2.to_dict())
+
+
 def _case(i, outcome, centre="Chennai", facts="Claim rejected for pre-existing disease."):
     return {"case_id": str(i), "centre": centre, "outcome": outcome, "facts": facts, "reasoning": ""}
 
