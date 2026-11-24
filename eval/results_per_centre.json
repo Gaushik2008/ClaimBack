@@ -1,0 +1,305 @@
+{
+  "Ahmedabad": {
+    "n": 379,
+    "label_counts": {
+      "dismissed": 322,
+      "allowed": 57
+    },
+    "systems": {
+      "majority": {
+        "accuracy": 0.85,
+        "accuracy_95_wilson_ci": [
+          0.81,
+          0.882
+        ],
+        "metrics": {
+          "n": 379,
+          "accuracy": 0.85,
+          "balanced_accuracy": 0.5,
+          "balanced_acc_95ci": [
+            0.5,
+            0.5
+          ],
+          "f1_allowed": 0.0,
+          "confusion": {
+            "dismissed->dismissed": 322,
+            "allowed->dismissed": 57
+          }
+        }
+      },
+      "keyword_rule": {
+        "accuracy": 0.689,
+        "accuracy_95_wilson_ci": [
+          0.64,
+          0.733
+        ],
+        "metrics": {
+          "n": 379,
+          "accuracy": 0.689,
+          "balanced_accuracy": 0.449,
+          "balanced_acc_95ci": [
+            0.409,
+            0.5
+          ],
+          "f1_allowed": 0.092,
+          "confusion": {
+            "dismissed->dismissed": 255,
+            "allowed->dismissed": 51,
+            "dismissed->allowed": 67,
+            "allowed->allowed": 6
+          }
+        }
+      },
+      "tfidf_knn": {
+        "accuracy": 0.842,
+        "accuracy_95_wilson_ci": [
+          0.802,
+          0.875
+        ],
+        "metrics": {
+          "n": 379,
+          "accuracy": 0.842,
+          "balanced_accuracy": 0.495,
+          "balanced_acc_95ci": [
+            0.491,
+            0.5
+          ],
+          "f1_allowed": 0.0,
+          "confusion": {
+            "dismissed->dismissed": 319,
+            "allowed->dismissed": 57,
+            "dismissed->allowed": 3
+          }
+        }
+      }
+    }
+  },
+  "Delhi": {
+    "n": 194,
+    "label_counts": {
+      "dismissed": 24,
+      "allowed": 170
+    },
+    "systems": {
+      "majority": {
+        "accuracy": 0.876,
+        "accuracy_95_wilson_ci": [
+          0.823,
+          0.915
+        ],
+        "metrics": {
+          "n": 194,
+          "accuracy": 0.876,
+          "balanced_accuracy": 0.5,
+          "balanced_acc_95ci": [
+            0.5,
+            0.5
+          ],
+          "f1_allowed": 0.934,
+          "confusion": {
+            "dismissed->allowed": 24,
+            "allowed->allowed": 170
+          }
+        }
+      },
+      "keyword_rule": {
+        "accuracy": 0.16,
+        "accuracy_95_wilson_ci": [
+          0.115,
+          0.218
+        ],
+        "metrics": {
+          "n": 194,
+          "accuracy": 0.16,
+          "balanced_accuracy": 0.485,
+          "balanced_acc_95ci": [
+            0.418,
+            0.532
+          ],
+          "f1_allowed": 0.099,
+          "confusion": {
+            "dismissed->dismissed": 22,
+            "allowed->dismissed": 161,
+            "dismissed->allowed": 2,
+            "allowed->allowed": 9
+          }
+        }
+      },
+      "tfidf_knn": {
+        "accuracy": 0.861,
+        "accuracy_95_wilson_ci": [
+          0.805,
+          0.903
+        ],
+        "metrics": {
+          "n": 194,
+          "accuracy": 0.861,
+          "balanced_accuracy": 0.616,
+          "balanced_acc_95ci": [
+            0.541,
+            0.729
+          ],
+          "f1_allowed": 0.922,
+          "confusion": {
+            "dismissed->allowed": 17,
+            "allowed->allowed": 160,
+            "allowed->dismissed": 10,
+            "dismissed->dismissed": 7
+          }
+        }
+      }
+    }
+  },
+  "Kolkata": {
+    "n": 67,
+    "label_counts": {
+      "dismissed": 19,
+      "allowed": 48
+    },
+    "systems": {
+      "majority": {
+        "accuracy": 0.716,
+        "accuracy_95_wilson_ci": [
+          0.599,
+          0.81
+        ],
+        "metrics": {
+          "n": 67,
+          "accuracy": 0.716,
+          "balanced_accuracy": 0.5,
+          "balanced_acc_95ci": [
+            0.5,
+            0.5
+          ],
+          "f1_allowed": 0.835,
+          "confusion": {
+            "dismissed->allowed": 19,
+            "allowed->allowed": 48
+          }
+        }
+      },
+      "keyword_rule": {
+        "accuracy": 0.388,
+        "accuracy_95_wilson_ci": [
+          0.28,
+          0.508
+        ],
+        "metrics": {
+          "n": 67,
+          "accuracy": 0.388,
+          "balanced_accuracy": 0.541,
+          "balanced_acc_95ci": [
+            0.438,
+            0.627
+          ],
+          "f1_allowed": 0.305,
+          "confusion": {
+            "dismissed->dismissed": 17,
+            "allowed->dismissed": 39,
+            "dismissed->allowed": 2,
+            "allowed->allowed": 9
+          }
+        }
+      },
+      "tfidf_knn": {
+        "accuracy": 0.597,
+        "accuracy_95_wilson_ci": [
+          0.477,
+          0.706
+        ],
+        "metrics": {
+          "n": 67,
+          "accuracy": 0.597,
+          "balanced_accuracy": 0.433,
+          "balanced_acc_95ci": [
+            0.36,
+            0.518
+          ],
+          "f1_allowed": 0.743,
+          "confusion": {
+            "dismissed->allowed": 18,
+            "allowed->dismissed": 9,
+            "dismissed->dismissed": 1,
+            "allowed->allowed": 39
+          }
+        }
+      }
+    }
+  },
+  "Chennai": {
+    "n": 81,
+    "label_counts": {
+      "dismissed": 50,
+      "allowed": 31
+    },
+    "systems": {
+      "majority": {
+        "accuracy": 0.617,
+        "accuracy_95_wilson_ci": [
+          0.508,
+          0.716
+        ],
+        "metrics": {
+          "n": 81,
+          "accuracy": 0.617,
+          "balanced_accuracy": 0.5,
+          "balanced_acc_95ci": [
+            0.5,
+            0.5
+          ],
+          "f1_allowed": 0.0,
+          "confusion": {
+            "dismissed->dismissed": 50,
+            "allowed->dismissed": 31
+          }
+        }
+      },
+      "keyword_rule": {
+        "accuracy": 0.617,
+        "accuracy_95_wilson_ci": [
+          0.508,
+          0.716
+        ],
+        "metrics": {
+          "n": 81,
+          "accuracy": 0.617,
+          "balanced_accuracy": 0.512,
+          "balanced_acc_95ci": [
+            0.465,
+            0.562
+          ],
+          "f1_allowed": 0.114,
+          "confusion": {
+            "dismissed->dismissed": 48,
+            "allowed->dismissed": 29,
+            "dismissed->allowed": 2,
+            "allowed->allowed": 2
+          }
+        }
+      },
+      "tfidf_knn": {
+        "accuracy": 0.568,
+        "accuracy_95_wilson_ci": [
+          0.459,
+          0.67
+        ],
+        "metrics": {
+          "n": 81,
+          "accuracy": 0.568,
+          "balanced_accuracy": 0.497,
+          "balanced_acc_95ci": [
+            0.419,
+            0.589
+          ],
+          "f1_allowed": 0.255,
+          "confusion": {
+            "dismissed->dismissed": 40,
+            "allowed->dismissed": 25,
+            "allowed->allowed": 6,
+            "dismissed->allowed": 10
+          }
+        }
+      }
+    }
+  }
+}

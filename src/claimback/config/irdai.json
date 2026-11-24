@@ -1,0 +1,16 @@
+{
+  "irda_guidelines": {
+    "source_url": "https://irdai.gov.in/document-detail?documentId=392949",
+    "retrieval_date": "2024-04-01",
+    "title": "Master Circular on Health Insurance Business (Ref: IRDAI/HLT/REG/CIR/099/05/2024 and earlier 2016/2020 guidelines)",
+    "rules": {
+      "initial_waiting_period_days": 30,
+      "accident_exception": true,
+      "ped_waiting_period_max_months": 36,
+      "moratorium_period_continuous_years": 5,
+      "grace_period_days": 30,
+      "grievance_redressal_turnaround_days": 15,
+      "ombudsman_appeal_limit_years": 1
+    }
+  }
+}

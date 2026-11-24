@@ -1,0 +1,112 @@
+{
+  "name": "ClaimBack Escalation Deadline Tracker",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "claim-deadline",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "Claim Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "amount": 8,
+        "unit": "days"
+      },
+      "id": "wait-7-days",
+      "name": "Wait until 7 Days Before (15 - 7 = 8 days)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "alerts@claimback.local",
+        "toEmail": "={{ $json.body.user_email }}",
+        "subject": "Action Required: Insurer Grievance Deadline in 7 Days (Claim #{{ $json.body.claim_no }})",
+        "text": "Dear Policyholder,\n\nUnder IRDAI regulations, your insurer has 15 days to resolve your submitted grievance representation.\n\nThere are 7 days remaining before the statutory window expires. If your insurer does not provide full relief, you are entitled to escalate your appeal directly to the Insurance Ombudsman.\n\nClaimBack Assistant"
+      },
+      "id": "send-email-7d",
+      "name": "Send 7-Day Reminder Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "amount": 6,
+        "unit": "days"
+      },
+      "id": "wait-final-day",
+      "name": "Wait until 1 Day Before",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "alerts@claimback.local",
+        "toEmail": "={{ $json.body.user_email }}",
+        "subject": "URGENT: Insurer Grievance Deadline Tomorrow - File Ombudsman Appeal",
+        "text": "Dear Policyholder,\n\nYour insurer's 15-day statutory response deadline ends tomorrow.\n\nIf you have not received satisfactory claim settlement, use ClaimBack to generate your Form VI-A complaint and escalate to the Insurance Ombudsman.\n\nClaimBack Assistant"
+      },
+      "id": "send-email-1d",
+      "name": "Send 1-Day Final Escalation Notice",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Claim Webhook": {
+      "main": [
+        [
+          {
+            "node": "Wait until 7 Days Before (15 - 7 = 8 days)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until 7 Days Before (15 - 7 = 8 days)": {
+      "main": [
+        [
+          {
+            "node": "Send 7-Day Reminder Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send 7-Day Reminder Email": {
+      "main": [
+        [
+          {
+            "node": "Wait until 1 Day Before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until 1 Day Before": {
+      "main": [
+        [
+          {
+            "node": "Send 1-Day Final Escalation Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

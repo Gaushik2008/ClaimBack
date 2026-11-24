@@ -22,7 +22,10 @@ _LEAK = re.compile("|".join(p for _, p in OUTCOME_RULES), re.I)
 
 
 def load_cases(path: str | Path) -> list[dict]:
-    return [json.loads(l) for l in Path(path).read_text(encoding="utf-8").splitlines() if l.strip()]
+    txt = Path(path).read_text(encoding="utf-8").strip()
+    if txt.startswith("["):
+        return json.loads(txt)
+    return [json.loads(l) for l in txt.splitlines() if l.strip()]
 
 
 def model_input(case: dict) -> str:
