@@ -36,3 +36,7 @@
 - [x] Switched the LLM backend to NVIDIA Nemotron 3 Ultra (`nvidia/nemotron-3-ultra-550b-a55b`) through the OpenAI-compatible endpoint `https://integrate.api.nvidia.com/v1`; key is read from `NVIDIA_API_KEY` and never stored. Model id taken from NVIDIA's build page
 - [x] Added a plain single-prompt baseline (`PlainLLM`) and `python -m claimback.eval.run_llm` (plain vs ClaimBack-RAG, Chennai leave-one-out, citation-hallucination rate). 16 tests pass with fake clients
 - [ ] **Not yet run live**: the authoring sandbox cannot reach NVIDIA and has no key. Run locally: `export NVIDIA_API_KEY=...; python -m claimback.eval.run_llm --limit 5` first, then the full run
+
+## 2026-11-24
+- Verified 2 of 7 real-case leads against Indian Kanoon (see docs/real_case_leads.md); 5 not found, none to be cited.
+- Added tests/fixtures/SYNTHETIC_awards.md (100 fictional awards, test/demo only, excluded from all metrics; fixed stray markup in entry 9055).
