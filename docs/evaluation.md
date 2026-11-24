@@ -58,3 +58,11 @@ Cases that reach the Ombudsman are not a random sample of all rejections. State 
 | Expert letter score | | | | |
 
 Include the test date range, model versions, and any known failure modes.
+
+
+## Update 2026-11-24: findings from the first real data
+
+- Data actually available: the CIO Mediclaim Book 17 digest (about 2012 awards, four centres). It is a public PDF, so memorisation by LLMs cannot be ruled out; a measured memorisation check is still required.
+- **The pooled benchmark is confounded by centre** (outcome mix differs sharply by ombudsman office). Always report the `centre_only` baseline next to any system. A system is only credible if it beats it, or if it is evaluated within a single balanced centre.
+- Current honest benchmark: Chennai only (n=36), leave-one-out. All non-LLM baselines are at chance (about 50%). Intervals are wide; say so on the slide.
+- Labels are rule-based and unverified until the 30-case audit is done.

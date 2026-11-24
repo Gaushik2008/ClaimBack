@@ -161,3 +161,8 @@ Check each source's terms of use before redistributing anything. Raw data is not
 ## License
 
 MIT. See [`LICENSE`](LICENSE).
+
+
+## Status (2026-11-24)
+
+Runnable today: `python -m claimback.awards.digest` (parse a CIO digest PDF to `data/processed/cases.jsonl`) and `python -m claimback.eval.run` (benchmark + baselines, writes `eval/results.json`). The LLM predictor in `src/claimback/eval/llm.py` is written and unit-tested with a fake client but **has not been run against a live model, so no ClaimBack accuracy is claimed**. See `progress.md` for the baseline findings and what is still open.

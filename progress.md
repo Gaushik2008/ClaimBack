@@ -14,3 +14,20 @@
 - [x] Added 9 unit tests; all pass. **Caveat:** tested on a synthetic fixture and a synthetic PDF only, not yet on real award PDFs
 - [x] Investigated why the award PDFs could not be found. Findings: the cioins.co.in homepage has no awards menu (only Archives and Download links, which the workspace cannot open); the CIO annual report 2023-24 describes a per-complainant award download using a registered mobile number, which suggests recent awards may not be published in bulk; older monthly PDFs do exist at direct links (found for Nov 2019, Apr 2021, Apr 2023, May 2023). **Consequence:** "use the newest awards as the test set" may not be possible, so the contamination control in `docs/evaluation.md` needs revising. Not resolved yet.
 
+
+## 2026-11-24 (build, day 1, continued: real data from the uploaded Mediclaim book)
+- [x] Obtained real data: the CIO "Mediclaim Book 17" digest (376 pages, text layer, ~400 case summaries, mostly 2012 awards) uploaded by the team. Raw PDF lives in `data/raw/digests/` (git-ignored)
+- [x] Built a digest parser (`src/claimback/awards/digest.py`; `python -m claimback.awards.digest`). 326 cases parsed (Ahmedabad 207, Chennai 57, Delhi 35, Kolkata 27). Complainant names are not stored. Outcome and ground labels are **rule-based and not hand-verified**: 251 labelled (allowed 79, dismissed 147, disposed 25), 75 unknown. A spot check of 14 cases found 2 wrong labels before fixes; the rules were then tightened, but real label accuracy is still unmeasured. `data/processed/label_audit.json` holds 30 cases for a human to check
+- [x] Built the benchmark (`src/claimback/eval/bench.py`): binary task (relief vs insurer upheld) from case facts only, outcome-stating sentences removed, deterministic split stratified by centre and outcome (149 train / 65 test), bootstrap CIs
+- [x] Built baselines and ran them (`python -m claimback.eval.run`, results in `eval/results.json`)
+- [x] **Key finding: the pooled benchmark is confounded by centre.** Ahmedabad cases are 113 upheld vs 3 relief; Delhi 34 relief vs 1 upheld; Kolkata 25 vs 2. A centre-only baseline scores 89.2% accuracy and a TF-IDF precedent kNN 90.8%, so the kNN adds nothing real. Do **not** report the pooled number as a system result
+- [x] Honest floor: within Chennai only (n=36, 17 relief / 19 upheld), leave-one-out accuracy is 50-53% for every baseline, i.e. chance. An LLM system must beat this, on a small sample, with wide intervals
+- [x] Wrote the LLM predictor (`src/claimback/eval/llm.py`): retrieves 5 precedents, asks for a JSON verdict, verifies that every cited case id was actually retrieved (citation-hallucination rate). **Not run against a live model** (no API key available here); tested with a fake client only
+- [x] 15 unit tests pass (parser, leakage filter, split determinism, metrics, baselines, citation verifier, LLM wrapper with a fake client)
+
+### Not done / next
+- [ ] Human-check `data/processed/label_audit.json` (30 cases) and report label accuracy
+- [ ] Run the LLM system and a plain single-prompt LLM on the Chennai set (needs `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`); report with CIs
+- [ ] Memorisation check (these 2012 awards are public and may be in training data)
+- [ ] Policy-wording parser, date/waiting-period checker, appeal-letter generator, UI, n8n deadline tracker
+- [ ] Collect 5-10 real rejection letters from real users (the strongest evidence available)

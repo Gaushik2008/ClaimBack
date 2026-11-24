@@ -1,0 +1,123 @@
+{
+  "train": 149,
+  "test": 65,
+  "test_label_counts": {
+    "allowed": 24,
+    "dismissed": 41
+  },
+  "systems": {
+    "majority": {
+      "n": 65,
+      "accuracy": 0.631,
+      "balanced_accuracy": 0.5,
+      "balanced_acc_95ci": [
+        0.5,
+        0.5
+      ],
+      "f1_allowed": 0.0,
+      "confusion": {
+        "allowed->dismissed": 24,
+        "dismissed->dismissed": 41
+      }
+    },
+    "centre_only": {
+      "n": 65,
+      "accuracy": 0.892,
+      "balanced_accuracy": 0.863,
+      "balanced_acc_95ci": [
+        0.768,
+        0.943
+      ],
+      "f1_allowed": 0.837,
+      "confusion": {
+        "allowed->dismissed": 6,
+        "dismissed->dismissed": 40,
+        "allowed->allowed": 18,
+        "dismissed->allowed": 1
+      }
+    },
+    "keyword_rule": {
+      "n": 65,
+      "accuracy": 0.554,
+      "balanced_accuracy": 0.448,
+      "balanced_acc_95ci": [
+        0.378,
+        0.518
+      ],
+      "f1_allowed": 0.065,
+      "confusion": {
+        "allowed->dismissed": 23,
+        "dismissed->dismissed": 35,
+        "dismissed->allowed": 6,
+        "allowed->allowed": 1
+      }
+    },
+    "tfidf_knn": {
+      "n": 65,
+      "accuracy": 0.908,
+      "balanced_accuracy": 0.892,
+      "balanced_acc_95ci": [
+        0.8,
+        0.965
+      ],
+      "f1_allowed": 0.87,
+      "confusion": {
+        "allowed->dismissed": 4,
+        "dismissed->dismissed": 39,
+        "allowed->allowed": 20,
+        "dismissed->allowed": 2
+      }
+    }
+  },
+  "chennai_leave_one_out": {
+    "n": 36,
+    "systems": {
+      "majority": {
+        "n": 36,
+        "accuracy": 0.528,
+        "balanced_accuracy": 0.5,
+        "balanced_acc_95ci": [
+          0.5,
+          0.5
+        ],
+        "f1_allowed": 0.0,
+        "confusion": {
+          "allowed->dismissed": 17,
+          "dismissed->dismissed": 19
+        }
+      },
+      "keyword_rule": {
+        "n": 36,
+        "accuracy": 0.528,
+        "balanced_accuracy": 0.506,
+        "balanced_acc_95ci": [
+          0.406,
+          0.611
+        ],
+        "f1_allowed": 0.19,
+        "confusion": {
+          "allowed->dismissed": 15,
+          "dismissed->dismissed": 17,
+          "dismissed->allowed": 2,
+          "allowed->allowed": 2
+        }
+      },
+      "tfidf_knn": {
+        "n": 36,
+        "accuracy": 0.5,
+        "balanced_accuracy": 0.489,
+        "balanced_acc_95ci": [
+          0.343,
+          0.639
+        ],
+        "f1_allowed": 0.357,
+        "confusion": {
+          "allowed->dismissed": 12,
+          "dismissed->dismissed": 13,
+          "dismissed->allowed": 6,
+          "allowed->allowed": 5
+        }
+      }
+    }
+  }
+}
