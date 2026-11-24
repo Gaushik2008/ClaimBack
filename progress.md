@@ -41,3 +41,11 @@
 - Verified 2 of 7 real-case leads against Indian Kanoon (see docs/real_case_leads.md); 5 not found, none to be cited.
 - Added tests/fixtures/SYNTHETIC_awards.md (100 fictional awards, test/demo only, excluded from all metrics; fixed stray markup in entry 9055).
 - Added eval/verified_real_cases.json (3 sourced HC orders; demo only, not in metrics). Note: all 3 are insurer losses, so selection bias applies.
+
+## 2026-11-24 (books 10, 11, 18)
+- Parser fix: Book 18 has no blank lines between paragraphs, so every case body was dropped (239/393 unknown). Added _fallback_paras and three outcome rules ("complaint dismissed", "complaint succeeds", "no formal award").
+- Result on the 3 new books (rule-based labels, NOT hand-verified): 700 unique cases (192+115+393 minus duplicates); 220 allowed, 352 dismissed, 13 disposed, 115 unknown.
+- Parse misses ~8-25% of "Case No" lines per book (e.g. Book10 192 of 209), cause not yet investigated.
+- Same centre confound persists: Ahmedabad 306 dismissed vs 61 allowed; Delhi 123 allowed vs 8 dismissed. Chennai only 25 labelled.
+- The outcome-rule change also affects Book 17 labels; re-run eval.run and re-audit label_audit.json.
+- Data stays in data/raw (git-ignored), not committed.

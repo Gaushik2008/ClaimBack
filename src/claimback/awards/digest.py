@@ -23,6 +23,8 @@ DATE_RE = re.compile(r"Award\s+dated\s+(.+)", re.I)
 MONEY_RE = re.compile(r"Rs\.?\s*([\d,]+(?:\.\d+)?)")
 
 OUTCOME_RULES = [  # order matters: first match wins
+    ("dismissed", r"complaint\s+(?:was\s+|is\s+|stands\s+)?(?:hereby\s+)?dismissed"),
+    ("disposed", r"no\s+formal\s+award"),
     ("dismissed", r"(?:settlement|decision|repudiation|deduction)[^.]{0,50}(?:is|are)\s+(?:in\s+order|correct|valid)"),
     ("allowed", r"(?:paid|pay|payment)[^.]{0,80}within\s+\d+\s+days|consent\s+letter"),
     ("disposed", r"mutually\s+agreed|redressed|settled\s+(?:the\s+)?(?:claim|complaint)\s+during|without\s+any\s+formal\s+award"),
@@ -30,6 +32,7 @@ OUTCOME_RULES = [  # order matters: first match wins
     ("disposed", r"beyond\s+the\s+jurisdiction|without\s+any\s+quantitative|withdrawn|time[\s-]*barred|not\s+maintainable|closed\s+the\s+file"),
     ("dismissed", r"not\s+payable|no\s+room\s+(?:for|to)\s+interfere|can\s*not\s+submit\s+any|decision[^.]{0,60}(?:justified|upheld|just\b|proper|fair|correct|in order)|(?:justified|rightly|upheld)|not\s+tenable\s+for\s+complainant|fails\s+to\s+succeed|without\s+any\s+relief|decision\s+is\s+(?:fully\s+)?(?:upheld|justified|just|proper)|(?:just|fair|justified)\s+(?:and\s+(?:fair|proper)\s+)?without|cannot\s+be\s+interfered|no\s+(?:new\s+)?ground\s+to\s+interfere|right\s+decision|stands\s+disposed|approved\s+the\s+decision"),
     ("allowed", r"complaint\s+is\s+(?:partly\s+)?allowed|not\s+(?:tenable|sustainable)|(?:unjustified|not\s+justified)|directed\s+to\s+pay|is\s+directed|shall\s+pay|award(?:ed)?\s+(?:of\s+)?Rs|pay\s+Rs|reimburse|set\s+aside|not\s+justified|liable\s+to\s+pay|complaint\s+(?:is\s+)?allowed|should\s+(?:pay|settle)"),
+    ("allowed", r"complaint\s+(?:is\s+|was\s+)?(?:partially\s+|partly\s+)?succe(?:ed|eds|eded)"),
 ]
 GROUND_RULES = [
     ("non_disclosure", r"non[\s-]*disclos|suppress|misrepresent|conceal|not\s+mentioned\s+in\s+the\s+proposal"),
@@ -89,6 +92,26 @@ def _centre_from_id(cid: str, last: Optional[str]) -> Optional[str]:
     return last
 
 
+def _fallback_paras(raw_lines: list[str]) -> list[str]:
+    """Books without blank lines between paragraphs: drop header lines, then
+    treat the first two sentences as facts and the rest as reasoning."""
+    body = []
+    for l in raw_lines:
+        t = l.strip()
+        if not t or re.match(r"(?i)^(case\s*no|award\s+(?:no\.?\s*\S+\s+)?dated|\*{5,})", t):
+            continue
+        if VS_RE.match(t) and len(t) < 160 and not body:
+            continue
+        if not body and len(t) < 80 and not t.endswith("."):
+            continue  # dispute-type / centre header line
+        body.append(t)
+    text = _norm(" ".join(body))
+    if len(text) < 70:
+        return []
+    sents = re.split(r"(?<=[.!?])\s+(?=[A-Z])", text)
+    return [" ".join(sents[:2]), " ".join(sents[2:])] if len(sents) > 2 else [text]
+
+
 def parse_case(centre: Optional[str], block: str) -> Optional[Case]:
     """``block`` starts at the 'Case No' line."""
     m = CASE_RE.search(block)
@@ -134,6 +157,8 @@ def parse_case(centre: Optional[str], block: str) -> Optional[Case]:
     paras = [p for p in paras if len(p) > 70 and not p.lower().startswith(("case no", "award"))]
     # drop header-ish paragraphs (party lines)
     paras = [p for p in paras if not VS_RE.match(p) or len(p) > 160]
+    if not paras:
+        paras = _fallback_paras(raw_lines)
     if not paras:
         return c
     c.facts = paras[0]
