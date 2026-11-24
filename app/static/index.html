@@ -222,6 +222,18 @@ footer.f{max-width:1180px;margin:90px auto 0;padding:26px 24px;border-top:1px so
   .hero .beam,.rise{animation:none}
   *{transition-duration:.01ms!important}
 }
+
+details.grp{border:1px solid var(--line,rgba(0,0,0,.12));border-radius:16px;padding:0 16px;margin:18px 0;background:rgba(255,255,255,.55)}
+details.grp>summary{cursor:pointer;list-style:none;padding:14px 0;font-weight:700;font-size:.95rem;display:flex;justify-content:space-between;gap:12px}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary small{font-weight:500;color:var(--dim,#5b6773)}
+details.grp[open]>summary{border-bottom:1px solid var(--line,rgba(0,0,0,.1));margin-bottom:12px}
+details.grp .body{padding-bottom:14px;display:grid;gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.chk{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+.chk label{display:flex;gap:8px;align-items:center;font-size:.9rem;font-weight:500}
+select.in,details.grp select{width:100%;min-height:44px;border-radius:12px;border:1px solid rgba(0,0,0,.18);padding:0 12px;background:#fff;font:inherit}
+@media(max-width:640px){.g3,.chk{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -338,6 +350,70 @@ footer.f{max-width:1180px;margin:90px auto 0;padding:26px 24px;border-top:1px so
         <p class="help">Diagnosis and treatment, as written by the hospital.</p>
         <textarea id="dischargeSummary" rows="2" placeholder="Admitted with… treated with…"></textarea>
 
+
+        <details class="grp" open><summary>About the claim <small>helps check deadlines and the shortfall</small></summary><div class="body">
+          <div class="g3">
+            <div><label class="l" for="claimType">How you claimed</label><select id="claimType"><option value="">Not sure</option><option value="reimbursement">Reimbursement (paid, then claimed)</option><option value="cashless">Cashless at the hospital</option></select></div>
+            <div><label class="l" for="rejectionKind">What happened</label><select id="rejectionKind"><option value="">Not sure</option><option value="full">Fully rejected</option><option value="partial">Partly paid</option><option value="cashless_denied">Cashless denied</option></select></div>
+            <div><label class="l" for="policyType">Policy type</label><select id="policyType"><option value="">Not sure</option><option value="individual">Individual</option><option value="floater">Family floater</option><option value="group">Group / employer</option><option value="senior">Senior citizen</option><option value="topup">Top-up / super top-up</option></select></div>
+          </div>
+          <div class="g3">
+            <div><label class="l" for="claimAmount">Amount claimed (₹)</label><input type="text" id="claimAmount" inputmode="numeric"></div>
+            <div><label class="l" for="settledAmount">Amount paid so far (₹)</label><input type="text" id="settledAmount" inputmode="numeric" placeholder="0 if nothing"></div>
+            <div><label class="l" for="sumInsured">Sum insured (₹)</label><input type="text" id="sumInsured" inputmode="numeric"></div>
+          </div>
+          <div class="g2">
+            <div><label class="l" for="rejectionDate">Date on the rejection letter</label><p class="help">Starts the Ombudsman filing window.</p><input type="date" id="rejectionDate"></div>
+            <div><label class="l" for="insurerName">Insurer</label><p class="help">Company name only.</p><input type="text" id="insurerName" autocomplete="off"></div>
+          </div>
+        </div></details>
+
+        <details class="grp"><summary>About the treatment <small>diagnosis, stay and hospital</small></summary><div class="body">
+          <div class="g2">
+            <div><label class="l" for="diagnosis">Diagnosis</label><input type="text" id="diagnosis" placeholder="e.g. acute appendicitis"></div>
+            <div><label class="l" for="treatmentType">Treatment type</label><select id="treatmentType"><option value="">Not sure</option><option value="inpatient">Inpatient stay</option><option value="daycare">Day-care procedure</option><option value="domiciliary">Treated at home</option></select></div>
+          </div>
+          <div class="g3">
+            <div><label class="l" for="dischargeDate">Discharge date</label><input type="date" id="dischargeDate"></div>
+            <div><label class="l" for="hospitalNetwork">Network hospital?</label><select id="hospitalNetwork"><option value="">Not sure</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            <div><label class="l" for="stateName">State you live in</label><p class="help">Decides your Ombudsman office.</p><input type="text" id="stateName" autocomplete="off"></div>
+          </div>
+        </div></details>
+
+        <details class="grp"><summary>Policy history <small>ported cover, waiting periods, disclosure</small></summary><div class="body">
+          <div class="g3">
+            <div><label class="l" for="pedWait">Waiting period in the letter</label><select id="pedWait"><option value="">None / not sure</option><option value="12">12 months</option><option value="24">24 months</option><option value="36">36 months</option><option value="48">48 months</option></select></div>
+            <div><label class="l" for="firstDiagnosed">Condition first diagnosed</label><p class="help">Month you first saw a doctor for it.</p><input type="date" id="firstDiagnosed"></div>
+            <div><label class="l" for="priorMonths">Months covered by an earlier insurer</label><p class="help">Only if you ported.</p><input type="number" min="0" id="priorMonths" value="0" inputmode="numeric"></div>
+          </div>
+          <div class="g2">
+            <div><label class="l" for="disclosed">Did you declare this condition when buying?</label><select id="disclosed"><option value="">Not sure</option><option value="yes">Yes, I declared it</option><option value="no">No</option><option value="never_asked">It was not asked</option></select></div>
+            <div><span class="l">Changes to the policy</span>
+              <label class="tg"><input type="checkbox" id="ported"><span class="sw" aria-hidden="true"></span><span class="t">I ported from another insurer</span></label>
+              <label class="tg" style="margin-top:8px"><input type="checkbox" id="siIncreased"><span class="sw" aria-hidden="true"></span><span class="t">I raised the sum insured recently</span></label></div>
+          </div>
+        </div></details>
+
+        <details class="grp"><summary>What you have done so far <small>sets your next step</small></summary><div class="body">
+          <div class="g3">
+            <div><span class="l">Written to the insurer?</span><label class="tg"><input type="checkbox" id="grievanceFiled"><span class="sw" aria-hidden="true"></span><span class="t">Yes, in writing</span></label></div>
+            <div><label class="l" for="grievanceDate">Date you wrote</label><input type="date" id="grievanceDate"></div>
+            <div><label class="l" for="insurerReplied">Did they reply?</label><select id="insurerReplied"><option value="">Not sure</option><option value="no">No reply</option><option value="yes">Yes, they replied</option></select></div>
+          </div>
+        </div></details>
+
+        <details class="grp"><summary>Documents you already have <small>we list what is missing</small></summary><div class="body"><div class="chk">
+          <label><input type="checkbox" name="docs" value="rejection_letter">Rejection letter</label>
+          <label><input type="checkbox" name="docs" value="policy_schedule">Policy schedule and wording</label>
+          <label><input type="checkbox" name="docs" value="discharge_summary">Discharge summary</label>
+          <label><input type="checkbox" name="docs" value="final_bill">Final bill and receipts</label>
+          <label><input type="checkbox" name="docs" value="investigation_reports">Lab and scan reports</label>
+          <label><input type="checkbox" name="docs" value="prescriptions">Prescriptions and notes</label>
+          <label><input type="checkbox" name="docs" value="claim_form">Claim form you submitted</label>
+          <label><input type="checkbox" name="docs" value="proposal_form">Proposal form</label>
+        </div></div></details>
+        <p class="help" style="margin-top:0">Do not enter your name, phone, Aadhaar or policy number here. Those are only needed when you draft the letter, and stay in your browser.</p>
+
         <button type="submit" class="btn block" id="analyzeBtn"><span id="analyzeLabel">Check my claim</span><span class="ar" aria-hidden="true">→</span></button>
       </form>
     </div>
@@ -445,6 +521,7 @@ function loadDemoCase(){
   $('isAccident').checked=true;
   $('policyText').value="Clause 4.1 Initial Waiting Period: Expenses related to the treatment of any illness within 30 days from policy inception shall be excluded. Exception: This exclusion does not apply if hospitalization is caused by an accidental injury requiring emergency treatment.\n\nClause 4.2 Specific Disease Waiting Period: 24 months.";
   $('dischargeSummary').value="Patient admitted via Emergency following road traffic accident resulting in right tibial fracture. Emergency open reduction and internal fixation performed.";
+  $('claimAmount').value='185000'; $('settledAmount').value='0'; $('rejectionDate').value='2026-11-02'; $('diagnosis').value='Fractured right tibia after a road accident'; $('treatmentType').value='inpatient'; $('claimType').value='reimbursement'; $('rejectionKind').value='full';
   toast('Fictional demo case loaded');
 }
 function tryDemo(){loadDemoCase();$('inputCard').scrollIntoView({behavior:'smooth'})}
@@ -460,13 +537,25 @@ async function handleAnalyze(e){
     policy_start_date:$('policyStartDate').value||null,
     admission_date:$('admissionDate').value||null,
     is_accident:$('isAccident').checked,
-    continuous_coverage_years:parseFloat($('continuityYears').value||0)||0
+    continuous_coverage_years:parseFloat($('continuityYears').value||0)||0,
+    intake:{
+      claim_type:$('claimType').value, rejection_kind:$('rejectionKind').value, policy_type:$('policyType').value,
+      claim_amount:$('claimAmount').value, settled_amount:$('settledAmount').value, sum_insured:$('sumInsured').value,
+      rejection_date:$('rejectionDate').value||null, insurer_name:$('insurerName').value,
+      diagnosis:$('diagnosis').value, treatment_type:$('treatmentType').value, discharge_date:$('dischargeDate').value||null,
+      hospital_network:$('hospitalNetwork').value, state:$('stateName').value,
+      ped_wait_months:$('pedWait').value, first_diagnosed_date:$('firstDiagnosed').value||null,
+      prior_cover_months:$('priorMonths').value, disclosed_at_proposal:$('disclosed').value,
+      ported:$('ported').checked, sum_insured_increased:$('siIncreased').checked,
+      grievance_filed:$('grievanceFiled').checked, grievance_date:$('grievanceDate').value||null, insurer_replied:$('insurerReplied').value,
+      documents_in_hand:[...document.querySelectorAll('input[name=docs]:checked')].map(x=>x.value)
+    }
   };
   try{
     const res=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     let data=null; try{data=await res.json()}catch(_){}
     if(!res.ok||!data||data.error){showError((data&&data.error)||'The server could not analyse this claim ('+res.status+'). Please try again.');return}
-    lastAnalysis=data; renderResults(data);
+    lastAnalysis=data; if(!$('uAmount').value) $('uAmount').value=$('claimAmount').value; if(!$('uDischarge').value) $('uDischarge').value=$('dischargeDate').value; renderResults(data);
   }catch(err){
     showError('Could not reach the ClaimBack server. Check that it is running and try again.');
   }finally{
@@ -482,6 +571,9 @@ const VERDICTS={
 };
 
 function renderResults(d){
+  (function(){let box=$('supportBox'); if(!box){box=document.createElement('div');box.id='supportBox';box.className='docs';$('timelineContainer').before(box)}
+    const f=d.supporting_factors||[]; box.classList.toggle('hidden',!f.length);
+    box.innerHTML=f.length?'<strong style="font-size:.86rem">Also worth knowing</strong><ul>'+f.map(x=>'<li>'+String(x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+'</li>').join('')+'</ul>':''})();
   const card=$('resultsCard'); card.classList.remove('hidden');
   const v=VERDICTS[d.verdict]||VERDICTS.insufficient_information;
   $('verdictBox').className='verdict '+v.cls;

@@ -27,6 +27,9 @@ import re
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+from datetime import date as _date
+
+from .rules.dates import check_condition_vs_policy, check_ombudsman_deadline, check_waiting_period_months
 from .privacy import mask_pii
 from .policy.parser import verify_clause_presence, parse_policy
 from .rules.dates import (
@@ -88,6 +91,7 @@ def analyze_claim(
     admission_date: Optional[str] = None,
     is_accident: bool = False,
     continuous_coverage_years: float = 0.0,
+    intake: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     # 1. Mask PII before processing
     masked_rejection, _ = mask_pii(rejection_text)
@@ -126,6 +130,53 @@ def analyze_claim(
             "advisory_note": chk_mora.advisory_note,
         })
 
+    # 4b. Structured intake: deadlines, condition/waiting period, shortfall, steps already taken
+    it = intake or {}
+    supporting: List[str] = []
+    today = _date.today()
+
+    def _d(k):
+        v = it.get(k)
+        return parse_date(v) if v else None
+
+    def _num(k):
+        try:
+            return float(str(it.get(k) or "").replace(",", "").strip() or 0)
+        except ValueError:
+            return 0.0
+
+    rej_d, grv_d = _d("rejection_date"), _d("grievance_date")
+    if rej_d:
+        replied = {"yes": True, "no": False}.get(str(it.get("insurer_replied", "")).lower())
+        r = check_ombudsman_deadline(rej_d, today, grv_d if it.get("grievance_filed") else None, replied)
+        date_checks.append({"check_name": r.check_name, "passed": r.passed, "details": r.details, "advisory_note": r.advisory_note})
+    diag_d = _d("first_diagnosed_date")
+    try:
+        ped_m = int(it.get("ped_wait_months") or 0)
+    except ValueError:
+        ped_m = 0
+    prior_m = int(_num("prior_cover_months"))
+    cond_chk = None
+    if diag_d and p_date and a_date and ped_m > 0:
+        cond_chk = check_condition_vs_policy(diag_d, p_date, ped_m, a_date, prior_m)
+        date_checks.append({"check_name": cond_chk.check_name, "passed": cond_chk.passed,
+                            "details": cond_chk.details, "advisory_note": cond_chk.advisory_note})
+    elif p_date and a_date and ped_m > 0:
+        w = check_waiting_period_months(p_date, a_date, ped_m, prior_m)
+        cond_chk = w
+        date_checks.append({"check_name": w.check_name, "passed": w.passed, "details": w.details, "advisory_note": w.advisory_note})
+    claimed, settled = _num("claim_amount"), _num("settled_amount")
+    if claimed and settled and claimed > settled:
+        supporting.append(f"Shortfall: Rs {claimed - settled:,.0f} of Rs {claimed:,.0f} was not paid.")
+    if str(it.get("disclosed_at_proposal", "")).lower() == "yes" and ground in ("non_disclosure", "pre_existing"):
+        supporting.append("You say the condition was disclosed at proposal. Keep the proposal form copy: it is the key proof.")
+    if it.get("ported"):
+        supporting.append("Ported cover usually carries waiting-period credit for the earlier insurer's years. Ask for the portability documents.")
+    if it.get("sum_insured_increased"):
+        supporting.append("A recent sum-insured increase can restart waiting periods for the added amount only. Check which amount is disputed.")
+    if str(it.get("claim_type", "")).lower() == "cashless" and str(it.get("hospital_network", "")).lower() == "no":
+        supporting.append("Cashless was sought at a non-network hospital. A reimbursement claim may be the right route.")
+
     # 5. Retrieve Precedents
     similar_precedents = []
     centre_bias_warning = None
@@ -160,6 +211,17 @@ def analyze_claim(
     if not policy_start_date:
         missing_docs.append("Initial Policy Inception Date (to compute waiting period)")
 
+    have = set(it.get("documents_in_hand") or [])
+    if it:
+        for key, label in (("rejection_letter", "Insurer's rejection letter"), ("policy_schedule", "Policy schedule and wording"),
+                           ("discharge_summary", "Hospital discharge summary"), ("final_bill", "Final hospital bill and payment receipts"),
+                           ("investigation_reports", "Investigation and lab reports"), ("prescriptions", "Doctor's prescriptions and treatment notes"),
+                           ("claim_form", "Submitted claim form"), ("proposal_form", "Proposal form (what you declared when buying)")):
+            already = (key == "policy_schedule" and (policy_text or any("Policy Wording" in m for m in missing_docs))) or \
+                      (key == "discharge_summary" and (discharge_summary or any("Discharge Summary" in m for m in missing_docs)))
+            if key not in have and label not in missing_docs and not already:
+                missing_docs.append(label)
+
     # 7. Synthesize Verdict (Deterministic rules drive verdict, precedents inform)
     # Check if evidence is thin
     if len(masked_rejection.strip()) < 30:
@@ -177,6 +239,12 @@ def analyze_claim(
         elif accident_waived:
             verdict = "strong_appeal"
             confidence = 0.88
+        elif cond_chk is not None and cond_chk.passed:
+            verdict = "strong_appeal"
+            confidence = 0.85
+        elif cond_chk is not None and not cond_chk.passed and not is_accident:
+            verdict = "insurer_likely_right"
+            confidence = 0.80
         elif initial_wait_failed and not is_accident:
             verdict = "insurer_likely_right"
             confidence = 0.85
@@ -218,5 +286,6 @@ def analyze_claim(
         "missing_documents": missing_docs,
         "escalation_path": escalation_path,
         "centre_bias_warning": centre_bias_warning,
+        "supporting_factors": supporting,
         "disclaimer": DEFAULT_DISCLAIMER
     }

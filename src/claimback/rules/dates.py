@@ -131,3 +131,43 @@ def check_moratorium(continuous_years_completed: float) -> DateCheckResult:
         statutory_threshold=int(threshold * 12),
         advisory_note="Protected by IRDAI Moratorium rule: insurer cannot repudiate for non-disclosure/PED." if passed else f"Moratorium of {threshold} continuous years not completed."
     )
+
+
+def check_ombudsman_deadline(rejection_date: date, today: date, grievance_date: Optional[date] = None,
+                             insurer_replied: Optional[bool] = None) -> DateCheckResult:
+    """Ombudsman complaint window: limit comes from config (ombudsman_appeal_limit_years, default 1).
+
+    Also reports whether the 30-day wait after a written grievance has passed with no reply.
+    Advisory only: verify the exact limitation rule in the current Insurance Ombudsman Rules.
+    """
+    years = int(_load_config().get("ombudsman_appeal_limit_years", 1))
+    try:
+        deadline = rejection_date.replace(year=rejection_date.year + years)
+    except ValueError:  # 29 Feb
+        deadline = rejection_date.replace(year=rejection_date.year + years, day=28)
+    left = (deadline - today).days
+    if left < 0:
+        det = f"The {years}-year window from the rejection ({rejection_date.isoformat()}) closed on {deadline.isoformat()}."
+        note = "The window may have passed. Ask the Ombudsman office whether a delay can be condoned; do not assume it can."
+        ok = False
+    else:
+        det = f"{left} days remain to file with the Ombudsman (deadline {deadline.isoformat()})."
+        note = "File well before this date." if left > 60 else "Urgent: file as soon as your documents are ready."
+        ok = True
+    if grievance_date is not None and insurer_replied is False:
+        waited = (today - grievance_date).days
+        det += f" You wrote to the insurer {waited} days ago with no reply."
+        if waited >= 30:
+            note += " A written grievance unanswered for 30 days is normally a ground to approach the Ombudsman."
+    return DateCheckResult(check_name="ombudsman_filing_window", passed=ok, details=det, advisory_note=note)
+
+
+def check_condition_vs_policy(first_diagnosed: date, policy_start: date, ped_wait_months: int,
+                              admission_date: date, continuity_months: int = 0) -> DateCheckResult:
+    """Was the condition first diagnosed before the policy, and is the PED/specific-disease wait over at admission?"""
+    pre = first_diagnosed < policy_start
+    res = check_waiting_period_months(policy_start, admission_date, ped_wait_months, continuity_months)
+    prefix = ("The condition was first diagnosed before the policy started, so the insurer may treat it as pre-existing. "
+              if pre else "The condition was first diagnosed after the policy started. ")
+    return DateCheckResult(check_name="condition_waiting_period", passed=res.passed,
+                           details=prefix + res.details, advisory_note=res.advisory_note)

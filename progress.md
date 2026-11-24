@@ -72,3 +72,9 @@
 
 ## 2026-11-24 (UI preview, added from chat)
 - [x] Added a light-theme static design alternative in `docs/ui-preview/` (not wired to the backend, not tested on real devices). It does not replace `app/static/index.html`; compare the two and port anything useful (hero sample-letter card, date-check result panel, evidence section with only measured numbers)
+
+## 2026-11-24 (structured intake)
+- [x] Intake form now collects: claim (how claimed, full/partial rejection, policy type, amounts claimed/paid, sum insured, rejection date, insurer), treatment (diagnosis, type, discharge date, network hospital, state), policy history (waiting period named, condition first diagnosed, months with an earlier insurer, declared at proposal, ported, sum insured raised), steps taken (grievance written/date/reply) and a documents-in-hand checklist. No names, phones or policy numbers are collected for analysis
+- [x] Pipeline uses it: Ombudsman filing-window check (limit from `irdai.json`), condition vs policy start and waiting-period check with ported-cover months (not double counted), shortfall amount, proposal-disclosure and ported/sum-insured notes, missing-document list from the checklist. Backward compatible with the old payload. 31 tests pass
+- [ ] Ombudsman-centre lookup by state is not built (needs a verified jurisdiction list); the filing-window rule must be checked against the current Insurance Ombudsman Rules
+- [ ] Not yet tested in a real browser on mobile

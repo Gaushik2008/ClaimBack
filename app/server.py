@@ -80,6 +80,7 @@ class ClaimBackHandler(BaseHTTPRequestHandler):
                 admission_date=admission_date,
                 is_accident=is_accident,
                 continuous_coverage_years=continuity_years,
+                intake=req_data.get("intake") if isinstance(req_data.get("intake"), dict) else None,
             )
             self._send_json(200, res)
             return
