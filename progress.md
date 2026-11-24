@@ -12,4 +12,5 @@
 - [x] Built the award parser (`src/claimback/awards/parser.py`): splits multi-award files, extracts insurer, nature of complaint, reason, amounts, facts, observations, outcome label, and a keyword ground-hint baseline. Leaves missing fields empty; does not store the complainant's name or address
 - [x] Built the PDF-to-JSONL build step (`python -m claimback.awards.build`) with a summary of parsed awards, outcomes and missing fields
 - [x] Added 9 unit tests; all pass. **Caveat:** tested on a synthetic fixture and a synthetic PDF only, not yet on real award PDFs
+- [x] Investigated why the award PDFs could not be found. Findings: the cioins.co.in homepage has no awards menu (only Archives and Download links, which the workspace cannot open); the CIO annual report 2023-24 describes a per-complainant award download using a registered mobile number, which suggests recent awards may not be published in bulk; older monthly PDFs do exist at direct links (found for Nov 2019, Apr 2021, Apr 2023, May 2023). **Consequence:** "use the newest awards as the test set" may not be possible, so the contamination control in `docs/evaluation.md` needs revising. Not resolved yet.
 

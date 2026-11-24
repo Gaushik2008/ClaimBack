@@ -21,6 +21,8 @@ Status: **plan**. No results yet. Fill in the results section only with numbers 
 
 Public awards may appear in a language model's training data. Use the most recent awards for testing and report the date range, so the reader can judge. If results on older and newer cases differ sharply, say so.
 
+**Update 2026-11-24:** the newest bulk-published awards may be from 2023 or earlier (recent awards seem to be available per complainant only), in which case recency alone cannot prevent contamination. If so: report that plainly, probe for memorisation (e.g. ask the model to complete award numbers or outcomes from facts it should not know), and put more weight on cases that cannot be in training data: real pilot letters, labelled by an expert.
+
 ### Selection bias
 
 Cases that reach the Ombudsman are not a random sample of all rejections. State this wherever accuracy numbers are shown, and complement the benchmark with real user cases.
