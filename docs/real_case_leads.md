@@ -15,3 +15,9 @@ These are High Court writ orders reviewing Ombudsman awards, not raw Ombudsman a
 
 Unverified does not mean false; it means no source was opened. Do not cite NOT FOUND items anywhere.
 Also found (not yet reviewed): P&H CWP-8789-2026 (23 Mar 2026), Star Health v. Ombudsman, award 81,468, writ dismissed: https://indiankanoon.org/doc/148382377/
+
+## Added 2026-11-24 from Indian Kanoon search "insurance ombudsman" year:2026 (900 hits; High Court orders, not awards)
+- Search page lists (not opened unless noted): SBI Life v. Ombudsman (Madras HC, 26 Feb and 9 Mar 2026, life); Gauhati WP(C)/2950/2024 (19 Feb 2026); Pothabathula Usha v. Ombudsman (AP HC, 8 Sep 2026); Subhash Kumar Yadav v. Ombudsman (Delhi HC, 7 Sep 2026); ICICI Lombard v. Ombudsman Pune (Bombay HC, 9 Jul 2026); Office of the Insurance Ombudsman v. M V Narasimha Prasad (Karnataka HC, 1 Jul 2026).
+- J. Jamuna Ezhilan v. Insurance Ombudsman, Madras HC, 15 Sep 2026: the case exists in the listing (https://indiankanoon.org/doc/92128511/) so lead 4's court date is real; content NOT read (that page was refused by the fetch tool). Described as life insurance, out of health scope.
+- VERIFIED, procedural: Karnataka HC WP 26221/2024, M V Narasimha Prasad v. Office of the Insurance Ombudsman, 27 Mar 2026 (https://indiankanoon.org/doc/10240587/). Health policy (Family Health Optima, 2019), cholecystitis/hernia surgery. Held that the Ombudsman's refusal of legal representation at the adjudicatory stage was untenable, quashed it, and asked the Ombudsman to try to dispose of the complaint in 90 days. Useful for the appeal guide (right to an advocate at Rule 17 stage), not as an outcome precedent.
+- Not fetched (outside the tool's allowed pages): doc 51134593, 24662424, 75841714, 34158221, 13756168, 112054698, 109181513.

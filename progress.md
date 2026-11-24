@@ -64,3 +64,6 @@
   - Total unique cases deduplicated across all 4 books: **1,086 cases** (outcomes: 443 dismissed, 316 allowed, 288 unknown, 39 disposed).
 - Built `data/processed/cases_all.json` containing 1,086 deduplicated structured cases with all required fields (git-ignored).
 - Built interactive stratified human audit module `src/claimback/eval/audit.py` to evaluate rule-based labels on 40 cases across Ahmedabad, Delhi, Kolkata, and Chennai.
+- Data stays in data/raw (git-ignored), not committed.
+- Added docs/BUILD_PROMPT.md (phased build prompt for fcc-claude).
+- Indian Kanoon 2026 search reviewed: 1 more verified (procedural) case logged; most hits are life-insurance or unopened. Council award PDFs not found via search.
