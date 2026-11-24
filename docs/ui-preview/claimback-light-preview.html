@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>ClaimBack – check whether your health claim was rejected fairly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mist:#EAF1F5; --paper:#FFFFFF; --ink:#0E1C2A; --ink2:#42566A; --line:#CFDCE5;
+  --cobalt:#1F4FD8; --cobalt-d:#173BA8; --mark:#FFE58A; --ok:#116B4A; --okbg:#DDF3E8;
+  --warn:#8A5A00; --warnbg:#FFF0CC; --bad:#A4261D; --badbg:#FADBD8;
+  --display:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif;
+  --serif:'Newsreader',Georgia,'Times New Roman',serif;
+  box-sizing:border-box; color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--mist);color:var(--ink);font:400 17px/1.55 var(--display);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--cobalt);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+header{position:sticky;top:0;z-index:5;background:rgba(234,241,245,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-weight:800;font-size:21px;letter-spacing:-.02em;text-decoration:none}
+.logo i{display:inline-block;width:14px;height:14px;background:var(--cobalt);border-radius:4px 4px 4px 0;margin-right:8px;vertical-align:-1px}
+nav{display:flex;gap:26px;align-items:center;font-size:15px;font-weight:500}
+nav a{text-decoration:none;color:var(--ink2)} nav a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border-radius:999px;border:0;background:var(--cobalt);color:#fff;font:700 16px var(--display);text-decoration:none;cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--cobalt-d)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)} .btn.ghost:hover{background:var(--ink);color:#fff}
+.hero{position:relative;padding:72px 0 96px;overflow:hidden;background:
+  radial-gradient(900px 420px at 85% 10%,#cfe0ee 0,transparent 70%),radial-gradient(700px 380px at 0% 100%,#dfeaf2 0,transparent 70%)}
+.hero .wrap{display:grid;grid-template-columns:1.25fr 1fr;gap:48px;align-items:center}
+h1{font-size:clamp(46px,7.4vw,92px);line-height:.96;letter-spacing:-.04em;font-weight:800;margin:0 0 26px}
+.lede{font-size:20px;color:var(--ink2);max-width:34ch;margin:0 0 32px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.stage{position:relative;min-height:420px}
+.letter{position:absolute;inset:0 0 auto 0;background:var(--paper);border-radius:6px;padding:28px 28px 26px;box-shadow:0 30px 60px -28px rgba(14,28,42,.35),0 0 0 1px var(--line);transform:rotate(1.6deg);font-family:var(--serif);font-size:16px;line-height:1.6}
+.letter small{display:block;font:600 12px var(--display);color:var(--ink2);margin-bottom:14px}
+.letter p{margin:0 0 10px}
+mark{background:var(--mark);padding:1px 3px;border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.letter .stamp{position:absolute;right:-12px;top:-16px;border:3px solid var(--bad);color:var(--bad);font:800 15px var(--display);padding:5px 14px;border-radius:6px;transform:rotate(7deg);background:#fff;animation:land .5s .3s both cubic-bezier(.2,1.4,.4,1)}
+@keyframes land{from{opacity:0;transform:rotate(7deg) scale(1.8)}to{opacity:1;transform:rotate(7deg) scale(1)}}
+.check{position:absolute;left:-26px;bottom:-6px;width:min(330px,92%);background:var(--paper);border-radius:18px;padding:18px 20px;box-shadow:0 24px 50px -22px rgba(14,28,42,.4),0 0 0 1px var(--line)}
+.check b{display:block;font-size:15px;margin-bottom:8px}
+.check .row{display:flex;justify-content:space-between;font-size:14px;color:var(--ink2);padding:5px 0;border-top:1px solid var(--line)}
+.check .row span:last-child{color:var(--ink);font-weight:600}
+.pill{display:inline-block;font-weight:700;font-size:13px;padding:4px 12px;border-radius:999px;margin-top:10px}
+.pill.ok{background:var(--okbg);color:var(--ok)} .pill.warn{background:var(--warnbg);color:var(--warn)} .pill.bad{background:var(--badbg);color:var(--bad)}
+section{padding:88px 0}
+h2{font-size:clamp(32px,4.4vw,52px);line-height:1.02;letter-spacing:-.03em;font-weight:800;margin:0 0 14px;max-width:18ch}
+.sub{color:var(--ink2);max-width:52ch;margin:0 0 44px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:2px solid var(--ink);counter-reset:s}
+.steps li{list-style:none;padding:22px 22px 0 0;counter-increment:s}
+.steps li::before{content:counter(s);display:block;font:800 40px/1 var(--display);color:var(--cobalt);margin-bottom:12px}
+.steps h3{font-size:19px;margin:0 0 6px;letter-spacing:-.01em} .steps p{margin:0;color:var(--ink2);font-size:15.5px}
+ul.steps{margin:0;padding:0}
+.demo{background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px;align-items:start}
+form{display:grid;gap:18px}
+label{display:block;font-weight:600;font-size:15px;margin-bottom:6px}
+.hint{font-weight:400;color:var(--ink2);font-size:13.5px;display:block}
+input,select{width:100%;min-height:48px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font:500 16px var(--display);background:#fff;color:var(--ink)}
+input:hover,select:hover{border-color:#9fb4c4}
+.result{background:var(--mist);border-radius:20px;padding:26px}
+.result h3{margin:0 0 4px;font-size:22px;letter-spacing:-.02em}
+.facts{margin:16px 0;padding:0;list-style:none}
+.facts li{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:15.5px}
+.facts li::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;margin-top:8px;background:var(--cobalt)}
+textarea{width:100%;min-height:250px;border:1.5px solid var(--line);border-radius:12px;padding:16px;font:400 15.5px/1.6 var(--serif);background:#fff;color:var(--ink);resize:vertical}
+.note{font-size:13.5px;color:var(--ink2);margin-top:12px}
+.evid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.ev{background:var(--paper);border-radius:20px;padding:26px;box-shadow:0 0 0 1px var(--line)}
+.ev strong{display:block;font-size:44px;line-height:1;letter-spacing:-.04em;margin-bottom:8px}
+.ev p{margin:0;color:var(--ink2);font-size:15.5px}
+.ev.pending strong{color:var(--ink2)}
+footer{padding:36px 0 48px;color:var(--ink2);font-size:14px;border-top:1px solid var(--line)}
+@media (max-width:900px){
+  .hero .wrap,.grid{grid-template-columns:1fr}
+  .stage{min-height:400px;margin-top:10px} .check{left:0}
+  .steps,.evid{grid-template-columns:1fr 1fr}
+  nav a:not(.btn){display:none}
+}
+@media (max-width:560px){.steps,.evid{grid-template-columns:1fr} section{padding:64px 0} .hero{padding:44px 0 72px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+  <a class="logo" href="#top"><i></i>ClaimBack</a>
+  <nav><a href="#how">How it works</a><a href="#try">Check your dates</a><a href="#proof">Our evidence</a><a class="btn" href="#try">Try a case</a></nav>
+</div></header>
+
+<main id="top">
+<div class="hero"><div class="wrap">
+  <div>
+    <h1>They said no. Were they allowed to?</h1>
+    <p class="lede">Upload a rejected health insurance claim. ClaimBack finds the clause the insurer used, checks the dates, and drafts your appeal.</p>
+    <div class="cta"><a class="btn" href="#try">Check my dates</a><a class="btn ghost" href="#how">See how it works</a></div>
+  </div>
+  <div class="stage" aria-hidden="true">
+    <div class="letter">
+      <span class="stamp">CLAIM REPUDIATED</span>
+      <small>Sample letter – fictional</small>
+      <p>Dear Policyholder, your claim for ₹1,42,000 has been repudiated.</p>
+      <p>Treatment of this condition is excluded <mark>for the first 24 months</mark> of continuous cover under Clause 4.3 of the policy.</p>
+      <p>Regards, Claims Department</p>
+    </div>
+    <div class="check">
+      <b>Date check</b>
+      <div class="row"><span>Policy started</span><span>12 Mar 2022</span></div>
+      <div class="row"><span>Admitted</span><span>9 Jun 2024</span></div>
+      <div class="row"><span>Time covered</span><span>27 months</span></div>
+      <span class="pill ok">Waiting period was over</span>
+    </div>
+  </div>
+</div></div>
+
+<section id="how"><div class="wrap">
+  <h2>From rejection letter to appeal</h2>
+  <p class="sub">The insurer must give a reason and point to your policy. ClaimBack tests that reason, step by step.</p>
+  <ul class="steps">
+    <li><h3>Read the rejection</h3><p>Pulls out the stated ground: waiting period, pre-existing disease, room rent, or “not medically necessary”.</p></li>
+    <li><h3>Find the clause</h3><p>Matches the ground to the policy wording and confirms the clause really exists in your document.</p></li>
+    <li><h3>Check the dates</h3><p>Works out waiting periods and continuity with plain date arithmetic, not a model’s guess.</p></li>
+    <li><h3>Draft the appeal</h3><p>Writes to the insurer’s grievance officer first, then the Insurance Ombudsman, with the documents to attach.</p></li>
+  </ul>
+</div></section>
+
+<section class="demo" id="try"><div class="wrap">
+  <h2>Check your dates now</h2>
+  <p class="sub">This preview runs only the date check, in your browser. Nothing is uploaded or stored.</p>
+  <div class="grid">
+    <form id="f" novalidate>
+      <div><label for="ground">Reason the insurer gave</label>
+        <select id="ground"><option value="wait">Waiting period or pre-existing disease</option><option value="nd">Non-disclosure of a condition</option><option value="other">Something else</option></select></div>
+      <div><label for="start">Policy start date <span class="hint">The first day you were continuously covered, including earlier insurers if you ported.</span></label>
+        <input type="date" id="start" value="2022-03-12"></div>
+      <div><label for="adm">Hospital admission date</label><input type="date" id="adm" value="2024-06-09"></div>
+      <div><label for="wp">Waiting period named in the letter</label>
+        <select id="wp"><option value="1">30 days (initial)</option><option value="12">12 months</option><option value="24" selected>24 months</option><option value="36">36 months</option><option value="48">48 months</option></select></div>
+      <div><label for="amt">Amount claimed (₹) <span class="hint">Optional, used in the letter.</span></label><input type="text" id="amt" inputmode="numeric" placeholder="e.g. 1,42,000"></div>
+    </form>
+    <div>
+      <div class="result" role="status" aria-live="polite" id="out"></div>
+      <div style="margin-top:22px">
+        <label for="letter">Draft appeal to the grievance officer</label>
+        <textarea id="letter"></textarea>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:12px"><button class="btn" id="copy" type="button">Copy letter</button><span id="copied" class="note" style="margin:0"></span></div>
+        <p class="note">Advisory only, not legal advice. Check every date and clause against your own documents before sending.</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="proof"><div class="wrap">
+  <h2>What we have measured so far</h2>
+  <p class="sub">Only real numbers from our repository. The full model results are not in yet, and we will not show a score until they are.</p>
+  <div class="evid">
+    <div class="ev"><strong>326</strong><p>public Ombudsman case summaries parsed into structured data. Complainant names are not stored.</p></div>
+    <div class="ev"><strong>50–53%</strong><p>accuracy of simple baselines on balanced Chennai cases (36 cases). That is chance, and it is the bar the model must beat.</p></div>
+    <div class="ev pending"><strong>Pending</strong><p>Nemotron 3 Ultra versus a plain prompt, with a check that every cited case is real.</p></div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">ClaimBack is an advisory tool and does not replace a lawyer or the Insurance Ombudsman. Sample letters on this page are fictional.</div></footer>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function fmt(d){return d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()}
+  function addMonths(d,m){var x=new Date(d.getFullYear(),d.getMonth()+m,d.getDate()); if(x.getDate()!==d.getDate()) x=new Date(d.getFullYear(),d.getMonth()+m+1,0); return x}
+  function diffMonths(a,b){var m=(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth(); if(b.getDate()<a.getDate()) m--; return m}
+  function parse(v){var p=v.split('-'); return p.length===3?new Date(+p[0],+p[1]-1,+p[2]):null}
+  function run(){
+    var s=parse($('start').value), a=parse($('adm').value), g=$('ground').value, w=+$('wp').value, amt=$('amt').value.trim();
+    var out=$('out');
+    if(!s||!a){out.innerHTML='<h3>Enter both dates</h3><p>Add the policy start and admission dates to see the check.</p>';$('letter').value='';return}
+    if(a<s){out.innerHTML='<h3>Check the dates</h3><p>The admission date is before the policy start date.</p>';$('letter').value='';return}
+    var days=Math.round((a-s)/864e5), elig=(w===1)?new Date(s.getTime()+30*864e5):addMonths(s,w), covered=diffMonths(s,a);
+    var over=a>=elig, label, cls, head, facts=[];
+    facts.push('Covered for '+(days<60?days+' days':covered+' months')+' before admission.');
+    facts.push('The '+(w===1?'30-day':w+'-month')+' waiting period ended on '+fmt(elig)+'.');
+    facts.push(over?'You were admitted '+Math.max(0,Math.round((a-elig)/864e5))+' days after it ended.':'You were admitted '+Math.round((elig-a)/864e5)+' days before it ended.');
+    if(covered>=60) facts.push('Over 60 months of continuous cover: insurers generally cannot contest claims on non-disclosure except for fraud. Confirm in your policy.');
+    if(g==='wait'){ if(over){label='Strong appeal on dates';cls='ok';head='The waiting period had already ended'}
+      else if(elig-a<=90*864e5){label='Weak appeal on dates';cls='warn';head='Close, but inside the waiting period'}
+      else {label='Insurer looks right on dates';cls='bad';head='Admitted inside the waiting period'} }
+    else if(g==='nd'){ if(covered>=60){label='Strong appeal';cls='ok';head='Moratorium period likely applies'}
+      else {label='Needs your documents';cls='warn';head='Dates alone cannot settle non-disclosure'} }
+    else {label='Needs your documents';cls='warn';head='Dates do not decide this reason'}
+    out.innerHTML='<span class="pill '+cls+'">'+label+'</span><h3 style="margin-top:12px">'+head+'</h3><ul class="facts">'+facts.map(function(f){return '<li>'+f+'</li>'}).join('')+'</ul><p class="note" style="margin:0">Date arithmetic only. The full ClaimBack run also reads the policy wording and compares past Ombudsman awards.</p>';
+    var claim=amt?' for ₹'+amt:'';
+    var body=(g==='wait'?
+      'The claim'+claim+' was repudiated citing a '+(w===1?'30-day':w+'-month')+' waiting period. My policy has been continuously in force since '+fmt(s)+', so that period ended on '+fmt(elig)+'. I was admitted on '+fmt(a)+', '+(over?'after it had ended.':'which you contend was inside it. Please share the exact clause and the dates you relied on.')
+      :g==='nd'?
+      'The claim'+claim+' was repudiated alleging non-disclosure. My policy has been in force since '+fmt(s)+' and I was admitted on '+fmt(a)+', after '+covered+' months of cover. Please provide the proposal form answer and the medical evidence you rely on.'
+      :'The claim'+claim+' was repudiated. My policy has been in force since '+fmt(s)+' and I was admitted on '+fmt(a)+'. Please state the exact policy clause relied on and the supporting documents.');
+    $('letter').value='To,\nThe Grievance Redressal Officer\n[Insurer name]\n\nSubject: Appeal against repudiation of claim – Policy no. [policy number], Claim no. [claim number]\n\nDear Sir/Madam,\n\n'+body+'\n\nI request you to reconsider and settle the claim within 15 days of this letter. If I do not receive a satisfactory reply, I will escalate the matter to the Insurance Ombudsman.\n\nEnclosures: rejection letter, policy document, discharge summary, hospital bills.\n\nYours faithfully,\n[Your name]\n[Contact details]';
+  }
+  ['start','adm','wp','ground','amt'].forEach(function(i){$(i).addEventListener('input',run);$(i).addEventListener('change',run)});
+  $('copy').addEventListener('click',function(){
+    var t=$('letter').value, n=$('copied');
+    function ok(){n.textContent='Letter copied'; setTimeout(function(){n.textContent=''},2200)}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){$('letter').select();document.execCommand('copy');ok()})}
+    else{$('letter').select();document.execCommand('copy');ok()}
+  });
+  run();
+})();
+</script>
+</body>
+</html>
