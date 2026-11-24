@@ -68,3 +68,4 @@
 - Added docs/BUILD_PROMPT.md (phased build prompt for fcc-claude).
 - Indian Kanoon 2026 search reviewed: 1 more verified (procedural) case logged; most hits are life-insurance or unopened. Council award PDFs not found via search.
 - UI redesign (cinematic dark, pill nav, hero + sample card, fact strip, how-it-works, honest-limits section). Fixes: XSS-safe rendering, inline errors instead of alert(), editable letter details, escalation steps shown, accurate masking copy (server-side; letter + discharge only), removed hardcoded corpus size and 'strictly adheres' claim. Tested headless Chrome 1440x900 and 390x844: no overflow, demo flow OK. Fonts blocked in sandbox so web fonts were not seen.
+- UI switched to light theme (cobalt on porcelain); all text colours >= 4.5:1; retested headless Chrome 1440x900 / 390x844.
