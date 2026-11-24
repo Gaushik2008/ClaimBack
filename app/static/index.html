@@ -3,550 +3,963 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ClaimBack - Health Insurance Appeal Assistant</title>
+  <title>ClaimBack &mdash; The $15-an-Hour Health Insurance Expert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #1e3a8a;
-      --primary-light: #3b82f6;
-      --success: #15803d;
-      --warning: #b45309;
-      --danger: #b91c1c;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #0f172a;
-      --text-muted: #475569;
-      --border: #e2e8f0;
+      --bg: #07090e;
+      --bg-surface: rgba(15, 23, 42, 0.65);
+      --bg-card: rgba(18, 26, 47, 0.75);
+      --bg-card-hover: rgba(24, 34, 61, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(56, 189, 248, 0.25);
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --accent-lime: #a3e635;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --success: #34d399;
+      --success-glow: rgba(52, 211, 153, 0.15);
+      --warning: #fbbf24;
+      --warning-glow: rgba(251, 191, 36, 0.15);
+      --danger: #f87171;
+      --danger-glow: rgba(248, 113, 113, 0.15);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.5;
-      padding-bottom: 60px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
     }
-    header {
-      background: var(--primary);
-      color: white;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+    /* Ambient dynamic backdrop glow */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -20%;
+      left: 20%;
+      width: 60vw;
+      height: 50vh;
+      background: radial-gradient(ellipse at center, rgba(30, 58, 138, 0.35), transparent 70%);
+      filter: blur(120px);
+      z-index: -2;
+      pointer-events: none;
     }
-    header h1 { font-size: 1.8rem; margin-bottom: 6px; }
-    header p { font-size: 0.95rem; opacity: 0.9; }
-    .banner {
-      background: #eff6ff;
-      border-left: 4px solid var(--primary-light);
-      padding: 12px 18px;
-      margin: 15px auto;
-      max-width: 900px;
-      font-size: 0.88rem;
-      color: #1e40af;
+    body::after {
+      content: "";
+      position: fixed;
+      bottom: -10%;
+      right: 10%;
+      width: 50vw;
+      height: 40vh;
+      background: radial-gradient(ellipse at center, rgba(14, 165, 233, 0.15), transparent 70%);
+      filter: blur(100px);
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    /* Floating Pill Navigation */
+    .nav-wrapper {
+      position: sticky;
+      top: 18px;
+      z-index: 999;
       display: flex;
-      align-items: center;
-      gap: 10px;
-      border-radius: 4px;
+      justify-content: center;
+      padding: 0 16px;
     }
-    .disclaimer-banner {
-      background: #fef2f2;
-      border-left: 4px solid var(--danger);
-      color: #991b1b;
-      font-weight: 500;
-    }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 15px;
-    }
-    .card {
-      background: var(--card-bg);
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 24px;
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .card h2 {
-      font-size: 1.25rem;
-      margin-bottom: 16px;
-      color: var(--primary);
+    .nav-pill {
       display: flex;
       align-items: center;
       justify-content: space-between;
-    }
-    .btn-demo {
-      background: #e0e7ff;
-      color: #3730a3;
-      border: 1px solid #c7d2fe;
-      padding: 4px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-    .btn-demo:hover { background: #c7d2fe; }
-    label {
-      display: block;
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-    textarea, input[type="text"], input[type="date"], select {
       width: 100%;
-      padding: 10px 12px;
+      max-width: 980px;
+      background: rgba(10, 15, 29, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      margin-bottom: 16px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
-    textarea:focus, input:focus, select:focus {
-      outline: none;
-      border-color: var(--primary-light);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    @media (max-width: 640px) {
-      .grid-2 { grid-template-columns: 1fr; }
-    }
-    .checkbox-group {
+    .brand {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.5px;
     }
-    .checkbox-group input { width: auto; margin-bottom: 0; }
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      width: 100%;
-      transition: background 0.15s;
+    .brand-badge {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-lime);
+      box-shadow: 0 0 12px var(--accent-lime);
     }
-    .btn-primary:hover { background: #172554; }
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.82rem;
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .nav-links a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #fff; }
+    .badge-pill {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent);
+      border-radius: 999px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .badge-strong { background: #dcfce7; color: var(--success); }
-    .badge-weak { background: #fef3c7; color: var(--warning); }
-    .badge-right { background: #fee2e2; color: var(--danger); }
-    .badge-info { background: #e0f2fe; color: #0369a1; }
-    .verdict-box {
-      border: 2px solid;
-      border-radius: 8px;
-      padding: 18px;
+
+    /* Hero Section */
+    .hero {
+      max-width: 980px;
+      margin: 40px auto 30px;
+      padding: 0 20px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-family: 'Space Grotesk', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       margin-bottom: 20px;
     }
-    .verdict-strong_appeal { border-color: var(--success); background: #f0fdf4; }
-    .verdict-weak_appeal { border-color: var(--warning); background: #fffbeb; }
-    .verdict-insurer_likely_right { border-color: var(--danger); background: #fef2f2; }
-    .verdict-insufficient_information { border-color: #0284c7; background: #f0f9ff; }
-    .timeline {
-      margin: 15px 0;
-      border-left: 2px solid var(--border);
-      padding-left: 16px;
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      margin-bottom: 18px;
+      background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .timeline-item {
-      position: relative;
-      margin-bottom: 12px;
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 28px;
+      font-weight: 400;
     }
-    .timeline-item::before {
-      content: "";
-      position: absolute;
-      left: -21px;
-      top: 5px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--primary-light);
-    }
-    .precedent-card {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
-    .letter-output {
-      background: #f1f5f9;
-      border: 1px solid var(--border);
-      padding: 16px;
-      border-radius: 6px;
-      font-family: monospace;
-      font-size: 0.88rem;
-      white-space: pre-wrap;
-      max-height: 400px;
-      overflow-y: auto;
-      margin-bottom: 12px;
-    }
-    .action-row {
+
+    /* Privacy and Disclaimer Micro-Banners */
+    .safety-strip {
       display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 35px;
+    }
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.8rem;
+      padding: 6px 14px;
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+    }
+    .chip-privacy {
+      background: rgba(16, 185, 129, 0.08);
+      color: #6ee7b7;
+      border-color: rgba(52, 211, 153, 0.2);
+    }
+    .chip-disclaimer {
+      background: rgba(245, 158, 11, 0.08);
+      color: #fcd34d;
+      border-color: rgba(251, 191, 36, 0.2);
+    }
+
+    /* Main Grid Layout */
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
       gap: 10px;
     }
-    .btn-secondary {
-      background: #e2e8f0;
-      color: var(--text);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-weight: 500;
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    /* Demo Button */
+    .btn-demo-pill {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent);
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-demo-pill:hover {
+      background: var(--accent);
+      color: #07090e;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    /* Form Fields */
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    textarea, input[type="text"], input[type="date"], input[type="number"] {
+      width: 100%;
+      background: rgba(9, 14, 28, 0.85);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    textarea:focus, input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+      background: rgba(13, 20, 38, 0.95);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 680px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .checkbox-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(9, 14, 28, 0.5);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .checkbox-box:hover { border-color: rgba(255, 255, 255, 0.2); }
+    .checkbox-box input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
       cursor: pointer;
     }
-    .btn-secondary:hover { background: #cbd5e1; }
-    .footer-fixed {
+    .checkbox-label {
+      font-size: 0.88rem;
+      color: var(--text);
+      font-weight: 500;
+      margin-bottom: 0;
+      text-transform: none;
+      cursor: pointer;
+    }
+
+    /* Modern Glow CTA Button */
+    .btn-glow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px 28px;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 30px -5px rgba(2, 132, 199, 0.4);
+    }
+    .btn-glow:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px -5px rgba(56, 189, 248, 0.5);
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    }
+
+    /* Verdict Display Box */
+    .verdict-banner {
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid;
+      position: relative;
+    }
+    .verdict-strong_appeal {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(52, 211, 153, 0.4);
+      box-shadow: 0 0 30px var(--success-glow);
+    }
+    .verdict-weak_appeal {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(251, 191, 36, 0.4);
+      box-shadow: 0 0 30px var(--warning-glow);
+    }
+    .verdict-insurer_likely_right {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(248, 113, 113, 0.4);
+      box-shadow: 0 0 30px var(--danger-glow);
+    }
+    .verdict-insufficient_information {
+      background: rgba(56, 189, 248, 0.08);
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge-status-strong { background: rgba(52, 211, 153, 0.15); color: var(--success); border: 1px solid rgba(52, 211, 153, 0.4); }
+    .badge-status-weak { background: rgba(251, 191, 36, 0.15); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.4); }
+    .badge-status-right { background: rgba(248, 113, 113, 0.15); color: var(--danger); border: 1px solid rgba(248, 113, 113, 0.4); }
+    .badge-status-info { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.4); }
+
+    /* Timeline and Check Grid */
+    .checks-grid {
+      display: grid;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .check-card {
+      background: rgba(9, 14, 28, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .check-title {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: #fff;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .check-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    /* Precedent Cards */
+    .precedent-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .precedent-item {
+      background: rgba(9, 14, 28, 0.7);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      transition: all 0.2s;
+    }
+    .precedent-item:hover {
+      border-color: var(--border-accent);
+      background: rgba(15, 23, 42, 0.85);
+    }
+    .prec-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .prec-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .prec-centre {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Appeal Letter Area */
+    .letter-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .letter-box {
+      background: rgba(5, 8, 16, 0.95);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.86rem;
+      line-height: 1.7;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      max-height: 480px;
+      overflow-y: auto;
+      margin-bottom: 18px;
+    }
+    .btn-action-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-secondary {
+      flex: 1;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Fixed Bottom Legal Notice */
+    .legal-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: #0f172a;
-      color: #94a3b8;
+      background: rgba(7, 9, 14, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
       text-align: center;
-      padding: 8px;
-      font-size: 0.8rem;
-      z-index: 100;
+      z-index: 900;
     }
-    .hidden { display: none; }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>ClaimBack</h1>
-  <p>Indian Health-Insurance Claim Rejection Appeal Assistant (Hackathon Track: $15-an-Hour Expert)</p>
-</header>
-
-<div class="container">
-  <div class="banner disclaimer-banner">
-    <span>⚠️</span>
-    <span><strong>Advisory information, not legal advice.</strong> Never promises a claim outcome.</span>
+  <!-- Floating Nav -->
+  <div class="nav-wrapper">
+    <nav class="nav-pill">
+      <div class="brand">
+        <span class="brand-badge"></span>
+        <span>ClaimBack</span>
+      </div>
+      <div class="nav-links">
+        <span class="badge-pill">Track: $15/hr Expert</span>
+        <a href="#inputCard">Appeal Tool</a>
+        <a href="https://github.com/Gaushik2008/ClaimBack" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </nav>
   </div>
 
-  <div class="banner">
-    <span>🔒</span>
-    <span><strong>Privacy Notice:</strong> All Aadhaar, PAN, Phone, Policy, and Claim numbers are masked client-side before submission. No personal documents are stored.</span>
-  </div>
+  <!-- Hero Header -->
+  <header class="hero">
+    <div class="hero-eyebrow">
+      <span>⚖️</span>
+      <span>Empowering Indian Health-Insurance Policyholders</span>
+    </div>
+    <h1>Turn Rejection Into Appeal.</h1>
+    <p>Understand rejection grounds, verify policy waiting periods against IRDAI guidelines, cross-check Ombudsman precedents, and generate grounded appeals.</p>
 
-  <!-- Input Form -->
-  <div class="card" id="inputCard">
-    <h2>
-      1. Paste or Upload Documents
-      <button class="btn-demo" onclick="loadDemoCase()">Load Fictional Demo Case</button>
-    </h2>
+    <div class="safety-strip">
+      <div class="chip chip-privacy">
+        <span>🛡️</span>
+        <span>Zero-Storage &bull; Aadhaar / PAN / Phone / Policy numbers masked client-side</span>
+      </div>
+      <div class="chip chip-disclaimer">
+        <span>⚠️</span>
+        <span>Advisory information, not legal advice &bull; Never promises an outcome</span>
+      </div>
+    </div>
+  </header>
 
-    <form id="claimForm" onsubmit="handleAnalyze(event)">
-      <label for="rejectionText">Rejection Letter Text *</label>
-      <textarea id="rejectionText" rows="5" placeholder="Paste the text from the insurer's rejection or repudiation letter..." required></textarea>
+  <!-- Main Container -->
+  <main class="container">
 
-      <div class="grid-2">
-        <div>
-          <label for="policyStartDate">First Policy Inception Date</label>
-          <input type="date" id="policyStartDate">
+    <!-- Document Input Card -->
+    <section class="glass-card" id="inputCard">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="step-num">1</span>
+          <span>Submit Claim Details</span>
         </div>
-        <div>
-          <label for="admissionDate">Hospital Admission Date</label>
-          <input type="date" id="admissionDate">
+        <button type="button" class="btn-demo-pill" onclick="loadDemoCase()">
+          <span>⚡</span>
+          <span>Load Fictional Demo Case</span>
+        </button>
+      </div>
+
+      <form id="claimForm" onsubmit="handleAnalyze(event)">
+        <label for="rejectionText">Rejection Letter Text *</label>
+        <textarea id="rejectionText" rows="4" placeholder="Paste the exact text from the insurer's rejection letter or email..." required></textarea>
+
+        <div class="grid-2">
+          <div>
+            <label for="policyStartDate">First Policy Inception Date</label>
+            <input type="date" id="policyStartDate">
+          </div>
+          <div>
+            <label for="admissionDate">Hospital Admission Date</label>
+            <input type="date" id="admissionDate">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label for="continuityYears">Continuous Coverage (Years)</label>
+            <input type="number" step="0.5" id="continuityYears" placeholder="e.g. 5.0 (for Moratorium check)" value="0">
+          </div>
+          <div style="padding-top: 25px;">
+            <label class="checkbox-box">
+              <input type="checkbox" id="isAccident">
+              <span class="checkbox-label">Accidental injury emergency admission (0-day waiting period)</span>
+            </label>
+          </div>
+        </div>
+
+        <label for="policyText">Policy Terms / Wordings (Optional &bull; For Clause Verification)</label>
+        <textarea id="policyText" rows="3" placeholder="Paste clauses from your policy wording to verify if the cited clause exists verbatim..."></textarea>
+
+        <label for="dischargeSummary">Hospital Discharge Summary (Optional)</label>
+        <textarea id="dischargeSummary" rows="2" placeholder="Primary diagnosis, surgical treatment, or active line of care..."></textarea>
+
+        <button type="submit" class="btn-glow" id="analyzeBtn">
+          <span>Analyze Claim &amp; Verify Clauses</span>
+          <span>&rarr;</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Results Section -->
+    <section class="glass-card hidden" id="resultsCard">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="step-num">2</span>
+          <span>Analysis &amp; Statutory Checks</span>
         </div>
       </div>
 
-      <div class="grid-2">
-        <div>
-          <label for="continuityYears">Years of Continuous Coverage</label>
-          <input type="number" step="0.5" id="continuityYears" placeholder="e.g. 5.0" value="0">
+      <div id="verdictBox" class="verdict-banner">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h3 id="verdictTitle" style="font-family:'Space Grotesk',sans-serif; font-size:1.3rem;">Verdict</h3>
+          <span id="verdictBadge" class="badge-status">Status</span>
         </div>
-        <div style="display:flex; align-items:center; padding-top:15px;">
-          <label class="checkbox-group">
-            <input type="checkbox" id="isAccident">
-            Emergency Accident / Trauma Hospitalization
-          </label>
+        <p id="verdictDescription" style="font-size:0.95rem; color:#e2e8f0; margin-bottom:10px;"></p>
+        <div style="font-size:0.82rem; color:var(--text-dim);" id="confidenceText"></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin-bottom:20px;">
+        <div class="check-card">
+          <div>
+            <div class="check-title">Rejection Ground</div>
+            <div class="check-desc" id="groundText" style="text-transform: capitalize; color:#fff; font-weight:600;"></div>
+          </div>
+        </div>
+        <div class="check-card">
+          <div>
+            <div class="check-title">Clause Verification</div>
+            <div class="check-desc" id="clauseText" style="color:#fff; font-weight:600;"></div>
+          </div>
+          <span id="clauseBadge" class="badge-status"></span>
         </div>
       </div>
 
-      <label for="policyText">Policy Terms / Wordings (Optional, for clause verification)</label>
-      <textarea id="policyText" rows="4" placeholder="Paste policy wording or relevant sections/clauses here..."></textarea>
-
-      <label for="dischargeSummary">Hospital Discharge Summary (Optional)</label>
-      <textarea id="dischargeSummary" rows="3" placeholder="Summary of diagnosis, surgical treatment, or active line of care..."></textarea>
-
-      <button type="submit" class="btn-primary" id="analyzeBtn">Analyze Claim & Verify Clauses</button>
-    </form>
-  </div>
-
-  <!-- Results Section -->
-  <div class="card hidden" id="resultsCard">
-    <h2>2. Analysis & Statutory Verification</h2>
-
-    <div id="verdictBox" class="verdict-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <span style="font-weight:700; font-size:1.1rem;" id="verdictTitle">Verdict</span>
-        <span class="badge" id="verdictBadge">Status</span>
+      <div id="centreWarning" class="chip chip-disclaimer hidden" style="width:100%; margin-bottom:18px; border-radius:8px; padding:12px;">
+        <span id="centreWarningText"></span>
       </div>
-      <p id="verdictDescription" style="font-size:0.95rem;"></p>
-      <div style="margin-top:6px; font-size:0.85rem; color:var(--text-muted);" id="confidenceText"></div>
-    </div>
 
-    <div style="margin-bottom:16px;">
-      <strong>Stated Rejection Ground:</strong> <span id="groundText" style="text-transform: capitalize;"></span><br>
-      <strong>Clause Cited:</strong> <span id="clauseText"></span>
-      <span class="badge" id="clauseBadge" style="margin-left:8px;"></span>
-    </div>
+      <h4 style="font-family:'Space Grotesk',sans-serif; color:#fff; margin-bottom:10px;">Deterministic Statutory &amp; Date Checks</h4>
+      <div id="timelineContainer" class="checks-grid"></div>
 
-    <div id="centreWarning" class="banner hidden" style="background:#fffbeb; color:#92400e; border-color:#f59e0b; margin-bottom:16px;">
-      <span id="centreWarningText"></span>
-    </div>
+      <h4 style="font-family:'Space Grotesk',sans-serif; color:#fff; margin-top:24px; margin-bottom:10px;">Relevant Ombudsman Precedents (1,086 Corpus)</h4>
+      <div id="precedentsContainer" class="precedent-list"></div>
 
-    <h3>Date & Waiting-Period Checks</h3>
-    <div id="timelineContainer" class="timeline"></div>
+      <div id="missingDocsContainer" class="hidden" style="margin-top:20px; padding:16px; background:rgba(255,255,255,0.03); border:1px dashed var(--border); border-radius:var(--radius-sm);">
+        <strong style="font-size:0.88rem; color:var(--accent);">Recommended Documents to Gather:</strong>
+        <ul id="missingDocsList" style="margin-left:20px; font-size:0.85rem; color:var(--text-muted); margin-top:6px;"></ul>
+      </div>
 
-    <h3 style="margin-top:16px;">Relevant Insurance Ombudsman Precedents</h3>
-    <div id="precedentsContainer" style="margin-top:8px;"></div>
+      <div style="margin-top:28px;">
+        <button type="button" class="btn-glow" onclick="generateAppealLetter()">
+          <span>Generate Grounded Appeal Letters</span>
+          <span>&darr;</span>
+        </button>
+      </div>
+    </section>
 
-    <div id="missingDocsContainer" style="margin-top:16px; padding:12px; background:#f8fafc; border:1px dashed var(--border); border-radius:6px;" class="hidden">
-      <strong>Recommended Supporting Documents to Gather:</strong>
-      <ul id="missingDocsList" style="margin-left:20px; font-size:0.9rem; margin-top:6px;"></ul>
-    </div>
+    <!-- Appeal Letter Card -->
+    <section class="glass-card hidden" id="letterCard">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="step-num">3</span>
+          <span>Grounded Appeal Drafts</span>
+        </div>
+      </div>
 
-    <div style="margin-top:20px;">
-      <button class="btn-primary" onclick="generateAppealLetter()">Generate Appeal Letter Drafts</button>
-    </div>
-  </div>
+      <div class="letter-tabs">
+        <button type="button" class="tab-btn active" id="btnGrievance" onclick="switchLetterTab('grievance')">Grievance Redressal Officer (GRO)</button>
+        <button type="button" class="tab-btn" id="btnOmbudsman" onclick="switchLetterTab('ombudsman')">Insurance Ombudsman (Form VI-A)</button>
+      </div>
 
-  <!-- Appeal Letter Section -->
-  <div class="card hidden" id="letterCard">
-    <h2>3. Draft Appeal Letters</h2>
-    <div style="display:flex; gap:10px; margin-bottom:12px;">
-      <button class="btn-secondary" id="btnGrievance" onclick="switchLetterTab('grievance')">Grievance Officer (GRO)</button>
-      <button class="btn-secondary" id="btnOmbudsman" onclick="switchLetterTab('ombudsman')">Insurance Ombudsman</button>
-    </div>
+      <div class="letter-box" id="letterContent"></div>
 
-    <div class="letter-output" id="letterContent"></div>
+      <div class="btn-action-row">
+        <button type="button" class="btn-secondary" onclick="copyLetter()">
+          <span>📋</span>
+          <span>Copy to Clipboard</span>
+        </button>
+        <button type="button" class="btn-secondary" onclick="downloadLetter()">
+          <span>💾</span>
+          <span>Download as Text File</span>
+        </button>
+      </div>
+    </section>
 
-    <div class="action-row">
-      <button class="btn-secondary" onclick="copyLetter()">📋 Copy Letter</button>
-      <button class="btn-secondary" onclick="downloadLetter()">💾 Download as Text</button>
-    </div>
-  </div>
-</div>
+  </main>
 
-<div class="footer-fixed">
-  ClaimBack &copy; 2026 &bull; Advisory information, not legal advice. All personal data masked.
-</div>
+  <footer class="legal-bar">
+    ClaimBack &bull; Advisory information, not legal advice &bull; Strictly adheres to IRDAI Master Circular (2024) and Ombudsman Precedent Corpus.
+  </footer>
 
-<script>
-let lastAnalysis = null;
-let currentTab = 'grievance';
-let letterData = { grievance: '', ombudsman: '' };
+  <script>
+    let lastAnalysis = null;
+    let currentTab = 'grievance';
+    let letterData = { grievance: '', ombudsman: '' };
 
-function loadDemoCase() {
-  document.getElementById('rejectionText').value = 
-    "We regret to inform you that your Mediclaim reimbursement claim under Policy No. 2023/POL/99128 is repudiated citing Clause 4.1. The admission occurred within the initial 30 days from policy inception. Claim No. CLM-889922. Contact claimant at rajesh@example.com, mobile 9876543210.";
-  document.getElementById('policyStartDate').value = "2023-01-01";
-  document.getElementById('admissionDate').value = "2023-01-15";
-  document.getElementById('continuityYears').value = "0";
-  document.getElementById('isAccident').checked = true;
-  document.getElementById('policyText').value = 
-    "Clause 4.1 Initial Waiting Period: Expenses related to the treatment of any illness within 30 days from policy inception shall be excluded. Exception: This exclusion does not apply if hospitalization is caused by an accidental injury requiring emergency treatment.\n\nClause 4.2 Specific Disease Waiting Period: 24 months.";
-  document.getElementById('dischargeSummary').value = 
-    "Patient admitted via Emergency following road traffic accident resulting in right tibial fracture. Emergency open reduction and internal fixation performed.";
-}
-
-async function handleAnalyze(e) {
-  e.preventDefault();
-  const btn = document.getElementById('analyzeBtn');
-  btn.disabled = true;
-  btn.innerText = "Analyzing...";
-
-  const payload = {
-    rejection_text: document.getElementById('rejectionText').value,
-    policy_text: document.getElementById('policyText').value,
-    discharge_summary: document.getElementById('dischargeSummary').value,
-    policy_start_date: document.getElementById('policyStartDate').value,
-    admission_date: document.getElementById('admissionDate').value,
-    is_accident: document.getElementById('isAccident').checked,
-    continuous_coverage_years: parseFloat(document.getElementById('continuityYears').value || 0)
-  };
-
-  try {
-    const res = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    lastAnalysis = data;
-    renderResults(data);
-  } catch (err) {
-    alert("Error communicating with server: " + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerText = "Analyze Claim & Verify Clauses";
-  }
-}
-
-function renderResults(data) {
-  const card = document.getElementById('resultsCard');
-  card.classList.remove('hidden');
-  card.scrollIntoView({ behavior: 'smooth' });
-
-  // Verdict box
-  const box = document.getElementById('verdictBox');
-  const title = document.getElementById('verdictTitle');
-  const badge = document.getElementById('verdictBadge');
-  const desc = document.getElementById('verdictDescription');
-  const conf = document.getElementById('confidenceText');
-
-  box.className = 'verdict-box verdict-' + data.verdict;
-  const verdictMap = {
-    strong_appeal: { text: "Strong Grounds for Appeal", class: "badge-strong", desc: "Your claim has strong merit under statutory IRDAI guidelines or verified policy terms. Repudiation appears unjustified." },
-    weak_appeal: { text: "Weak Grounds for Appeal", class: "badge-weak", desc: "Evidence supporting relief is limited. Proceeding with appeal may carry lower likelihood of success." },
-    insurer_likely_right: { text: "Insurer Likely Right", class: "badge-right", desc: "Deterministic checks indicate the insurer repudiated strictly under unambiguous policy terms (e.g. unexpired waiting period)." },
-    insufficient_information: { text: "Insufficient Information", class: "badge-info", desc: "The provided documents do not contain enough details to reach a conclusive advisory verdict." }
-  };
-  const vInfo = verdictMap[data.verdict] || verdictMap.insufficient_information;
-  title.innerText = vInfo.text;
-  badge.innerText = data.verdict.replace(/_/g, ' ');
-  badge.className = 'badge ' + vInfo.class;
-  desc.innerText = vInfo.desc;
-  conf.innerText = "Confidence: " + Math.round(data.confidence * 100) + "%";
-
-  // Stated ground & clause
-  document.getElementById('groundText').innerText = data.rejection_ground.replace(/_/g, ' ');
-  document.getElementById('clauseText').innerText = data.clause_cited || "Not specified in rejection letter";
-  const clBadge = document.getElementById('clauseBadge');
-  if (data.clause_cited) {
-    if (data.clause_verified) {
-      clBadge.innerText = "VERIFIED IN POLICY";
-      clBadge.className = "badge badge-strong";
-    } else {
-      clBadge.innerText = "CLAUSE NOT FOUND IN UPLOADED POLICY";
-      clBadge.className = "badge badge-right";
+    function loadDemoCase() {
+      document.getElementById('rejectionText').value = 
+        "We regret to inform you that your Mediclaim reimbursement claim under Policy No. 2023/POL/99128 is repudiated citing Clause 4.1. The admission occurred within the initial 30 days from policy inception. Claim No. CLM-889922. Contact claimant at rajesh@example.com, mobile 9876543210.";
+      document.getElementById('policyStartDate').value = "2023-01-01";
+      document.getElementById('admissionDate').value = "2023-01-15";
+      document.getElementById('continuityYears').value = "0";
+      document.getElementById('isAccident').checked = true;
+      document.getElementById('policyText').value = 
+        "Clause 4.1 Initial Waiting Period: Expenses related to the treatment of any illness within 30 days from policy inception shall be excluded. Exception: This exclusion does not apply if hospitalization is caused by an accidental injury requiring emergency treatment.\n\nClause 4.2 Specific Disease Waiting Period: 24 months.";
+      document.getElementById('dischargeSummary').value = 
+        "Patient admitted via Emergency following road traffic accident resulting in right tibial fracture. Emergency open reduction and internal fixation performed.";
     }
-  } else {
-    clBadge.innerText = "NO CLAUSE CITED";
-    clBadge.className = "badge badge-info";
-  }
 
-  // Centre bias warning
-  const cWarn = document.getElementById('centreWarning');
-  if (data.centre_bias_warning) {
-    cWarn.classList.remove('hidden');
-    document.getElementById('centreWarningText').innerText = data.centre_bias_warning;
-  } else {
-    cWarn.classList.add('hidden');
-  }
+    async function handleAnalyze(e) {
+      e.preventDefault();
+      const btn = document.getElementById('analyzeBtn');
+      btn.disabled = true;
+      btn.innerHTML = "<span>Analyzing Claim...</span>";
 
-  // Timeline
-  const tl = document.getElementById('timelineContainer');
-  tl.innerHTML = '';
-  if (data.date_checks && data.date_checks.length > 0) {
-    data.date_checks.forEach(dc => {
-      const item = document.createElement('div');
-      item.className = 'timeline-item';
-      item.innerHTML = `<strong>${dc.check_name.replace(/_/g, ' ').toUpperCase()}:</strong> ${dc.details} <span class="badge ${dc.passed ? 'badge-strong' : 'badge-right'}">${dc.passed ? 'PASSED' : 'FAILED'}</span><br><small style="color:var(--text-muted);">${dc.advisory_note}</small>`;
-      tl.appendChild(item);
-    });
-  } else {
-    tl.innerHTML = '<span style="font-size:0.9rem; color:var(--text-muted);">No dates supplied for timeline verification.</span>';
-  }
+      const payload = {
+        rejection_text: document.getElementById('rejectionText').value,
+        policy_text: document.getElementById('policyText').value,
+        discharge_summary: document.getElementById('dischargeSummary').value,
+        policy_start_date: document.getElementById('policyStartDate').value,
+        admission_date: document.getElementById('admissionDate').value,
+        is_accident: document.getElementById('isAccident').checked,
+        continuous_coverage_years: parseFloat(document.getElementById('continuityYears').value || 0)
+      };
 
-  // Precedents
-  const prec = document.getElementById('precedentsContainer');
-  prec.innerHTML = '';
-  if (data.similar_precedents && data.similar_precedents.length > 0) {
-    data.similar_precedents.forEach(p => {
-      const d = document.createElement('div');
-      d.className = 'precedent-card';
-      d.innerHTML = `<strong>Case ID: ${p.case_id}</strong> (${p.centre} Centre) &bull; <span class="badge ${p.outcome === 'allowed' ? 'badge-strong' : 'badge-right'}">${p.outcome}</span><br><small>${p.why_similar}</small>`;
-      prec.appendChild(d);
-    });
-  } else {
-    prec.innerHTML = '<span style="font-size:0.9rem; color:var(--text-muted);">No matching precedents found.</span>';
-  }
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        lastAnalysis = data;
+        renderResults(data);
+      } catch (err) {
+        alert("Server error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "<span>Analyze Claim &amp; Verify Clauses</span><span>&rarr;</span>";
+      }
+    }
 
-  // Missing docs
-  const mdCont = document.getElementById('missingDocsContainer');
-  const mdList = document.getElementById('missingDocsList');
-  mdList.innerHTML = '';
-  if (data.missing_documents && data.missing_documents.length > 0) {
-    mdCont.classList.remove('hidden');
-    data.missing_documents.forEach(doc => {
-      const li = document.createElement('li');
-      li.innerText = doc;
-      mdList.appendChild(li);
-    });
-  } else {
-    mdCont.classList.add('hidden');
-  }
-}
+    function renderResults(data) {
+      const card = document.getElementById('resultsCard');
+      card.classList.remove('hidden');
+      card.scrollIntoView({ behavior: 'smooth' });
 
-async function generateAppealLetter() {
-  if (!lastAnalysis) return;
-  try {
-    const res = await fetch('/api/letter', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        case_summary: lastAnalysis,
-        user_inputs: {
-          complainant_name: "[TO FILL: Policyholder Name]",
-          policy_no: "[TO FILL: Policy Number]",
-          claim_no: "[TO FILL: Claim Number]",
-          claim_amount: "[TO FILL: Claim Amount in INR]",
-          admission_date: document.getElementById('admissionDate').value || "[TO FILL: DD/MM/YYYY]",
-          discharge_date: "[TO FILL: DD/MM/YYYY]"
+      // Verdict styling
+      const box = document.getElementById('verdictBox');
+      const title = document.getElementById('verdictTitle');
+      const badge = document.getElementById('verdictBadge');
+      const desc = document.getElementById('verdictDescription');
+      const conf = document.getElementById('confidenceText');
+
+      box.className = 'verdict-banner verdict-' + data.verdict;
+      const verdictMap = {
+        strong_appeal: { text: "Strong Grounds for Appeal", badgeClass: "badge-status-strong", desc: "Your claim has strong merit under statutory IRDAI guidelines or verified policy terms. Repudiation appears unjustified." },
+        weak_appeal: { text: "Weak Grounds for Appeal", badgeClass: "badge-status-weak", desc: "Evidence supporting relief is limited. Proceeding with appeal may carry lower likelihood of success." },
+        insurer_likely_right: { text: "Insurer Likely Right", badgeClass: "badge-status-right", desc: "Deterministic checks indicate the insurer repudiated strictly under unambiguous policy terms (e.g. unexpired waiting period)." },
+        insufficient_information: { text: "Insufficient Information", badgeClass: "badge-status-info", desc: "The provided documents do not contain enough details to reach a conclusive advisory verdict." }
+      };
+      const vInfo = verdictMap[data.verdict] || verdictMap.insufficient_information;
+      title.innerText = vInfo.text;
+      badge.innerText = data.verdict.replace(/_/g, ' ');
+      badge.className = 'badge-status ' + vInfo.badgeClass;
+      desc.innerText = vInfo.desc;
+      conf.innerText = "Confidence: " + Math.round(data.confidence * 100) + "%";
+
+      // Ground & Clause
+      document.getElementById('groundText').innerText = data.rejection_ground.replace(/_/g, ' ');
+      document.getElementById('clauseText').innerText = data.clause_cited || "Not cited";
+      const clBadge = document.getElementById('clauseBadge');
+      if (data.clause_cited) {
+        if (data.clause_verified) {
+          clBadge.innerText = "VERIFIED IN POLICY";
+          clBadge.className = "badge-status badge-status-strong";
+        } else {
+          clBadge.innerText = "NOT IN UPLOADED POLICY";
+          clBadge.className = "badge-status badge-status-right";
         }
-      })
-    });
-    const data = await res.json();
-    letterData = data;
-    const card = document.getElementById('letterCard');
-    card.classList.remove('hidden');
-    switchLetterTab(currentTab);
-    card.scrollIntoView({ behavior: 'smooth' });
-  } catch (err) {
-    alert("Error generating appeal letter: " + err.message);
-  }
-}
+      } else {
+        clBadge.innerText = "NO CLAUSE";
+        clBadge.className = "badge-status badge-status-info";
+      }
 
-function switchLetterTab(tab) {
-  currentTab = tab;
-  document.getElementById('btnGrievance').style.background = (tab === 'grievance') ? 'var(--primary)' : '#e2e8f0';
-  document.getElementById('btnGrievance').style.color = (tab === 'grievance') ? 'white' : 'var(--text)';
-  document.getElementById('btnOmbudsman').style.background = (tab === 'ombudsman') ? 'var(--primary)' : '#e2e8f0';
-  document.getElementById('btnOmbudsman').style.color = (tab === 'ombudsman') ? 'white' : 'var(--text)';
+      // Centre warning
+      const cWarn = document.getElementById('centreWarning');
+      if (data.centre_bias_warning) {
+        cWarn.classList.remove('hidden');
+        document.getElementById('centreWarningText').innerText = data.centre_bias_warning;
+      } else {
+        cWarn.classList.add('hidden');
+      }
 
-  document.getElementById('letterContent').innerText = letterData[tab] || '';
-}
+      // Timeline / Date checks
+      const tl = document.getElementById('timelineContainer');
+      tl.innerHTML = '';
+      if (data.date_checks && data.date_checks.length > 0) {
+        data.date_checks.forEach(dc => {
+          const item = document.createElement('div');
+          item.className = 'check-card';
+          item.innerHTML = `
+            <div>
+              <div class="check-title">${dc.check_name.replace(/_/g, ' ').toUpperCase()}</div>
+              <div class="check-desc">${dc.details} &bull; <em>${dc.advisory_note}</em></div>
+            </div>
+            <span class="badge-status ${dc.passed ? 'badge-status-strong' : 'badge-status-right'}">${dc.passed ? 'PASSED' : 'FAILED'}</span>
+          `;
+          tl.appendChild(item);
+        });
+      } else {
+        tl.innerHTML = '<div class="check-desc">No dates supplied for statutory waiting-period verification.</div>';
+      }
 
-function copyLetter() {
-  const text = document.getElementById('letterContent').innerText;
-  navigator.clipboard.writeText(text);
-  alert("Appeal letter copied to clipboard!");
-}
+      // Precedents
+      const prec = document.getElementById('precedentsContainer');
+      prec.innerHTML = '';
+      if (data.similar_precedents && data.similar_precedents.length > 0) {
+        data.similar_precedents.forEach(p => {
+          const d = document.createElement('div');
+          d.className = 'precedent-item';
+          d.innerHTML = `
+            <div class="prec-header">
+              <span class="prec-id">${p.case_id}</span>
+              <span class="badge-status ${p.outcome === 'allowed' ? 'badge-status-strong' : 'badge-status-right'}">${p.outcome}</span>
+            </div>
+            <div class="prec-centre">${p.centre} Ombudsman Centre</div>
+            <div style="font-size:0.84rem; color:var(--text-muted); margin-top:6px;">${p.why_similar}</div>
+          `;
+          prec.appendChild(d);
+        });
+      } else {
+        prec.innerHTML = '<div class="check-desc">No precedents matching this ground.</div>';
+      }
 
-function downloadLetter() {
-  const text = document.getElementById('letterContent').innerText;
-  const blob = new Blob([text], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `ClaimBack_Appeal_${currentTab}.txt`;
-  a.click();
-}
-</script>
+      // Missing docs
+      const mdCont = document.getElementById('missingDocsContainer');
+      const mdList = document.getElementById('missingDocsList');
+      mdList.innerHTML = '';
+      if (data.missing_documents && data.missing_documents.length > 0) {
+        mdCont.classList.remove('hidden');
+        data.missing_documents.forEach(doc => {
+          const li = document.createElement('li');
+          li.innerText = doc;
+          mdList.appendChild(li);
+        });
+      } else {
+        mdCont.classList.add('hidden');
+      }
+    }
 
+    async function generateAppealLetter() {
+      if (!lastAnalysis) return;
+      try {
+        const res = await fetch('/api/letter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            case_summary: lastAnalysis,
+            user_inputs: {
+              complainant_name: "[TO FILL: Policyholder Name]",
+              policy_no: "[TO FILL: Policy Number]",
+              claim_no: "[TO FILL: Claim Number]",
+              claim_amount: "[TO FILL: Claim Amount in INR]",
+              admission_date: document.getElementById('admissionDate').value || "[TO FILL: DD/MM/YYYY]",
+              discharge_date: "[TO FILL: DD/MM/YYYY]"
+            }
+          })
+        });
+        const data = await res.json();
+        letterData = data;
+        const card = document.getElementById('letterCard');
+        card.classList.remove('hidden');
+        switchLetterTab(currentTab);
+        card.scrollIntoView({ behavior: 'smooth' });
+      } catch (err) {
+        alert("Error generating letter: " + err.message);
+      }
+    }
+
+    function switchLetterTab(tab) {
+      currentTab = tab;
+      document.getElementById('btnGrievance').classList.toggle('active', tab === 'grievance');
+      document.getElementById('btnOmbudsman').classList.toggle('active', tab === 'ombudsman');
+      document.getElementById('letterContent').innerText = letterData[tab] || '';
+    }
+
+    function copyLetter() {
+      const text = document.getElementById('letterContent').innerText;
+      navigator.clipboard.writeText(text);
+      alert("Draft appeal letter copied to clipboard!");
+    }
+
+    function downloadLetter() {
+      const text = document.getElementById('letterContent').innerText;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `ClaimBack_Appeal_${currentTab}.txt`;
+      a.click();
+    }
+  </script>
 </body>
 </html>
