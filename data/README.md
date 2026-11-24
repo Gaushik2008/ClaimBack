@@ -32,3 +32,10 @@ The assistant workspace cannot reach cioins.co.in (blocked by its network policy
    ```
 
 The script prints how many awards were parsed, the outcome counts and which fields were missing. PDFs with no extractable text are listed separately; they are scans and need OCR.
+
+## Mediclaim digest PDF (required for the benchmark)
+
+The PDF is not in the repo (public CIO publication, git-ignored). Place it at
+`data/raw/digests/Mediclaim-Book17.pdf`, or pass `--pdf PATH`. Then:
+
+    python -m claimback.awards.digest      # expect: 326 cases

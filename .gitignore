@@ -20,8 +20,11 @@ node_modules/
 
 # Data: never commit raw or processed data, or real user documents
 data/raw/*
+!data/raw/digests/
+data/raw/digests/*
 data/processed/*
 !data/raw/.gitkeep
+!data/raw/digests/.gitkeep
 !data/processed/.gitkeep
 
 # Editors / OS

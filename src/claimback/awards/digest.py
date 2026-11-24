@@ -186,14 +186,34 @@ def summarize(cases: list[Case]) -> dict:
     }
 
 
+def read_pdf_text(pdf: str) -> str:
+    """pdftotext -layout if installed (best), else pdfplumber/pypdf (works on Windows)."""
+    import shutil
+    import subprocess
+
+    if shutil.which("pdftotext"):
+        return subprocess.run(["pdftotext", "-layout", pdf, "-"], capture_output=True, text=True, check=True).stdout
+    try:
+        import pdfplumber
+
+        with pdfplumber.open(pdf) as d:
+            return "\n".join((p.extract_text() or "") + "\f" for p in d.pages)
+    except Exception:
+        from pypdf import PdfReader
+
+        return "\n".join((p.extract_text() or "") + "\f" for p in PdfReader(pdf).pages)
+
+
 def main(argv=None) -> int:
-    import argparse, subprocess
+    import argparse
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--pdf", default="data/raw/digests/Mediclaim-Book17.pdf")
     ap.add_argument("--out", default="data/processed/cases.jsonl")
     a = ap.parse_args(argv)
-    text = subprocess.run(["pdftotext", "-layout", a.pdf, "-"], capture_output=True, text=True, check=True).stdout
+    if not Path(a.pdf).exists():
+        raise SystemExit(f"PDF not found: {a.pdf}\nPut the CIO Mediclaim book there (data/raw/digests/Mediclaim-Book17.pdf) or pass --pdf PATH.")
+    text = read_pdf_text(a.pdf)
     cases = build_digest(text)
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     with open(a.out, "w", encoding="utf-8") as fh:
