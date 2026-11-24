@@ -1,0 +1,48 @@
+{
+  "note": "High Court writ orders reviewing Ombudsman awards. Facts limited to what the cited pages stated. Not part of the 326-case benchmark; not used in any metric.",
+  "cases": [
+    {
+      "id": "PHHC-CWP-499-2026",
+      "court": "Punjab & Haryana High Court",
+      "decided": "2026-03-20",
+      "insurer": "Star Health & Allied Insurance",
+      "disease": "Broncho-pneumonia / LRTI",
+      "claim_amount_inr": 126274,
+      "insurer_ground": "pre-existing pulmonary tuberculosis",
+      "ombudsman_outcome": "relief to complainant",
+      "awarded_inr": 117611,
+      "key_reasoning": "2022 policy treated as renewal of 2020 policy; 36-month waiting period inapplicable",
+      "court_outcome": "insurer's writ dismissed",
+      "source": "https://indiankanoon.org/doc/55284993/",
+      "caveat": "policy dates on source page are internally inconsistent"
+    },
+    {
+      "id": "PHHC-CWP-30851-2025",
+      "court": "Punjab & Haryana High Court",
+      "decided": "2026-04-20",
+      "ombudsman_award_date": "2025-09-15",
+      "insurer": "Star Health & Allied Insurance",
+      "disease": "NASH-related chronic liver disease with jaundice (per discharge summary)",
+      "claim_amount_inr": 72617,
+      "insurer_ground": "inferred pre-existing disease under 4 years; cashless denied 2024-03-09",
+      "ombudsman_outcome": "relief to complainant",
+      "key_reasoning": "no medical document supported the inference; condition not among the 14 waiting-period exclusions",
+      "court_outcome": "insurer's writ dismissed",
+      "source": "https://indiankanoon.org/doc/114640410/"
+    },
+    {
+      "id": "PHHC-CWP-8789-2026",
+      "court": "Punjab & Haryana High Court",
+      "decided": "2026-03-23",
+      "insurer": "Star Health & Allied Insurance",
+      "disease": "not stated in what was read (forearm pain/swelling symptoms)",
+      "insurer_ground": "pre-existing condition",
+      "ombudsman_outcome": "relief to complainant",
+      "awarded_inr": 81468,
+      "key_reasoning": "condition diagnosed only after policy began; two years of symptoms are not a diagnosis",
+      "court_outcome": "insurer's writ dismissed",
+      "source": "https://indiankanoon.org/doc/148382377/",
+      "caveat": "read via a summary mirror; reconfirm on the Indian Kanoon page"
+    }
+  ]
+}

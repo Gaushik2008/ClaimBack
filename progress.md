@@ -40,3 +40,4 @@
 ## 2026-11-24
 - Verified 2 of 7 real-case leads against Indian Kanoon (see docs/real_case_leads.md); 5 not found, none to be cited.
 - Added tests/fixtures/SYNTHETIC_awards.md (100 fictional awards, test/demo only, excluded from all metrics; fixed stray markup in entry 9055).
+- Added eval/verified_real_cases.json (3 sourced HC orders; demo only, not in metrics). Note: all 3 are insurer losses, so selection bias applies.
