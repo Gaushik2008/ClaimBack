@@ -48,5 +48,19 @@
 - Parse misses ~8-25% of "Case No" lines per book (e.g. Book10 192 of 209), cause not yet investigated.
 - Same centre confound persists: Ahmedabad 306 dismissed vs 61 allowed; Delhi 123 allowed vs 8 dismissed. Chennai only 25 labelled.
 - The outcome-rule change also affects Book 17 labels; re-run eval.run and re-audit label_audit.json.
-- Data stays in data/raw (git-ignored), not committed.
-- Added docs/BUILD_PROMPT.md (phased build prompt for fcc-claude).
+## 2026-11-24 (Phase 0: Setup and Data completed)
+- Virtualenv configured with Python 3.11 (`.venv`), all dependencies installed (`pip install -e .[dev]`).
+- Placed Books 10, 11, 17, 18 in `data/raw/digests/` (kept git-ignored).
+- Investigated parser misses:
+  - Root cause 1: Inline `Order No... Case No` layout (Book 11) and lowercase/colons `Case No.:` variants (Book 10, 11) were missed by `re.finditer(r"Case\s*No\.?\s*[0-9A-Za-z]")`.
+  - Root cause 2: Multi-line party lines where `V/s` was alone or on the preceding line caused missing insurer names.
+  - Root cause 3: Form-feeds (`\x0c`) and two-digit year endings (`.08`, `/09`) required expanded date parsing.
+- Fixed parser in `src/claimback/awards/digest.py` and added regression tests in `tests/test_digest_and_eval.py`:
+  - 17 unit tests passing with `pytest -v`.
+  - Book 10 count increased from 192 to 215 cases.
+  - Book 11 count increased from 115 to 140 cases.
+  - Book 17 parsed 326 cases.
+  - Book 18 count increased from 393 to 406 cases.
+  - Total unique cases deduplicated across all 4 books: **1,086 cases** (outcomes: 443 dismissed, 316 allowed, 288 unknown, 39 disposed).
+- Built `data/processed/cases_all.json` containing 1,086 deduplicated structured cases with all required fields (git-ignored).
+- Built interactive stratified human audit module `src/claimback/eval/audit.py` to evaluate rule-based labels on 40 cases across Ahmedabad, Delhi, Kolkata, and Chennai.
