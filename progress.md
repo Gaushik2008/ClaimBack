@@ -31,3 +31,8 @@
 - [ ] Memorisation check (these 2012 awards are public and may be in training data)
 - [ ] Policy-wording parser, date/waiting-period checker, appeal-letter generator, UI, n8n deadline tracker
 - [ ] Collect 5-10 real rejection letters from real users (the strongest evidence available)
+
+## 2026-11-24 (NVIDIA backend)
+- [x] Switched the LLM backend to NVIDIA Nemotron 3 Ultra (`nvidia/nemotron-3-ultra-550b-a55b`) through the OpenAI-compatible endpoint `https://integrate.api.nvidia.com/v1`; key is read from `NVIDIA_API_KEY` and never stored. Model id taken from NVIDIA's build page
+- [x] Added a plain single-prompt baseline (`PlainLLM`) and `python -m claimback.eval.run_llm` (plain vs ClaimBack-RAG, Chennai leave-one-out, citation-hallucination rate). 16 tests pass with fake clients
+- [ ] **Not yet run live**: the authoring sandbox cannot reach NVIDIA and has no key. Run locally: `export NVIDIA_API_KEY=...; python -m claimback.eval.run_llm --limit 5` first, then the full run

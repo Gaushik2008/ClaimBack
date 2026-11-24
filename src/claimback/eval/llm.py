@@ -1,7 +1,8 @@
 """ClaimBack LLM predictor: retrieved precedents + structured verdict + citation check.
 
-NOT YET RUN against a live model (no API key was available when this was written).
-Set ANTHROPIC_API_KEY and ANTHROPIC_MODEL, then: python -m claimback.eval.llm --chennai
+Default backend: NVIDIA Nemotron 3 Ultra via the OpenAI-compatible NIM endpoint.
+NOT YET RUN against a live model (no key / no network to NVIDIA in the authoring sandbox).
+Run locally: export NVIDIA_API_KEY=...; python -m claimback.eval.run_llm
 """
 from __future__ import annotations
 
@@ -49,20 +50,41 @@ def verify_citations(reply: dict, precedents: list[dict]) -> dict:
     return {"cited": len(cited), "invalid": len(bad), "invalid_ids": bad}
 
 
-def call_anthropic(prompt: str, model: str | None = None) -> str:
-    key = os.environ["ANTHROPIC_API_KEY"]
-    body = json.dumps({"model": model or os.environ["ANTHROPIC_MODEL"], "max_tokens": 700,
-                       "system": SYSTEM, "messages": [{"role": "user", "content": prompt}]}).encode()
-    req = urllib.request.Request("https://api.anthropic.com/v1/messages", body,
-                                 {"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.load(r)["content"][0]["text"]
+NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
+NVIDIA_MODEL = "nvidia/nemotron-3-ultra-550b-a55b"
+
+
+def call_nvidia(prompt: str, system: str = SYSTEM, model: str | None = None) -> str:
+    """OpenAI-compatible chat call. Reads the key from NVIDIA_API_KEY (never stored in the repo)."""
+    body = json.dumps({"model": model or os.environ.get("NVIDIA_MODEL", NVIDIA_MODEL), "temperature": 0,
+                       "max_tokens": 1500, "stream": False,
+                       "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}]}).encode()
+    req = urllib.request.Request(NVIDIA_URL, body, {"Authorization": f"Bearer {os.environ['NVIDIA_API_KEY']}",
+                                                    "Content-Type": "application/json", "Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=120) as r:
+        msg = json.load(r)["choices"][0]["message"]
+    return msg.get("content") or ""  # reasoning_content, if any, is ignored
+
+
+class PlainLLM:
+    """Single-prompt baseline: same model, no retrieval, no citation check."""
+    name = "plain_llm"
+
+    def __init__(self, client=call_nvidia):
+        self.client = client
+
+    def fit(self, train):
+        return self
+
+    def predict(self, case):
+        p = f"CASE FACTS:\n{model_input(case)}\n\nGive your JSON verdict (cited_precedents must be empty)."
+        return parse_reply(self.client(p))["verdict"] or "dismissed"
 
 
 class ClaimBackLLM:
     name = "claimback_llm_rag"
 
-    def __init__(self, k: int = 5, client=call_anthropic):
+    def __init__(self, k: int = 5, client=call_nvidia):
         self.k, self.client = k, client
         self.audit: list[dict] = []
 

@@ -1,7 +1,7 @@
 from claimback.awards.digest import build_digest
 from claimback.eval.bench import metrics, model_input, split
 from claimback.eval.baselines import CentreOnly, TfidfKNN
-from claimback.eval.llm import ClaimBackLLM, build_prompt, parse_reply, verify_citations
+from claimback.eval.llm import ClaimBackLLM, PlainLLM, build_prompt, parse_reply, verify_citations
 
 SAMPLE = """
                     AHMEDABAD OMBUDSMAN CENTRE
@@ -69,3 +69,8 @@ def test_llm_wrapper_with_fake_client():
     m = ClaimBackLLM(k=2, client=fake).fit(tr)
     assert m.predict(_case("Q", "x")) == "allowed"
     assert m.audit[0]["invalid"] == 1 and "[A]" in build_prompt(_case("Q", "x"), tr)
+
+
+def test_plain_llm_with_fake_client():
+    assert PlainLLM(client=lambda p: '{"verdict":"dismissed"}').predict(_case("Q", "x")) == "dismissed"
+    assert PlainLLM(client=lambda p: "garbled").predict(_case("Q", "x")) == "dismissed"  # fallback
