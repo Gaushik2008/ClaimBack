@@ -5,7 +5,7 @@
 
 Built for **Homingo Hack Days 2026** · Track: **LLM apps** · Prompt: **C1 — "The $15-an-hour expert"**
 
-**Status:** early. Project skeleton and plan only; nothing is runnable yet. See [`progress.md`](progress.md) for what is done and what is next.
+**Status:** early. The award parser exists and is tested on synthetic data; the verdict pipeline is not built yet. See [`progress.md`](progress.md) for what is done and what is next.
 
 ---
 
@@ -111,6 +111,7 @@ ClaimBack/
 │   ├── raw/             # downloaded PDFs (git-ignored)
 │   └── processed/       # parsed awards and policy text (git-ignored)
 ├── src/claimback/       # application code
+│   └── awards/          # award PDF text -> structured cases
 ├── prompts/             # versioned prompts
 ├── eval/                # benchmark and evaluation scripts
 └── tests/               # unit tests
@@ -118,7 +119,15 @@ ClaimBack/
 
 ## Getting started
 
-Not runnable yet. Setup instructions will be added here once the first working pipeline lands. Track the build in [`progress.md`](progress.md).
+The full product is not runnable yet. What exists today is the award ingestion step:
+
+```bash
+pip install -e ".[dev]"
+pytest                                   # parser tests (synthetic fixtures)
+python -m claimback.awards.build --raw data/raw/awards --out data/processed/awards.jsonl
+```
+
+The build step needs Ombudsman award PDFs in `data/raw/awards/`; see [`data/README.md`](data/README.md). Track the build in [`progress.md`](progress.md).
 
 ## Roadmap
 

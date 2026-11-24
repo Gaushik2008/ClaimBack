@@ -5,7 +5,10 @@ description = "Health-insurance claim-rejection appeal assistant"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-dependencies = []
+dependencies = ["pdfplumber>=0.11", "pypdf>=4.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
 
 [build-system]
 requires = ["setuptools>=68"]
