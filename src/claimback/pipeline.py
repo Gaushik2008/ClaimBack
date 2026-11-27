@@ -43,18 +43,20 @@ from .awards.digest import GROUND_RULES
 
 DEFAULT_DISCLAIMER = "Advisory information, not legal advice."
 
-# Cache precedents from processed corpus
+# Cache precedents from processed corpus or packaged compact corpus
 CORPUS_PATH = Path(__file__).parent.parent.parent / "data" / "processed" / "cases_all.json"
+PACKAGED_CORPUS_PATH = Path(__file__).parent / "data" / "precedents_compact.json"
 
 
 def _load_corpus() -> list[dict]:
-    if CORPUS_PATH.exists():
-        try:
-            with open(CORPUS_PATH, "r", encoding="utf-8") as f:
-                cases = json.load(f)
-                return [c for c in cases if c.get("outcome") in ("allowed", "dismissed")]
-        except Exception:
-            pass
+    for p in (CORPUS_PATH, PACKAGED_CORPUS_PATH):
+        if p.exists():
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    cases = json.load(f)
+                    return [c for c in cases if c.get("outcome") in ("allowed", "dismissed")]
+            except Exception:
+                pass
     return []
 
 
